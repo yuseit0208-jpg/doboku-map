@@ -1,7 +1,6 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
-<title>全国 土木建築名所帖</title>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>全国 土木建築名所帖</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@700;800&family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: 東京版と同じ「測量台帳」。上に地方タブと全国地図、年代軸、その下に台帳行。 */
 :root{
@@ -128,6 +127,37 @@ footer p{margin:0}
   .side{grid-column:2;justify-items:start;grid-auto-flow:column;justify-content:start;gap:16px}
 }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+<style>
+/* 冊子（TOKYO Walking 風）に合わせた見た目 */
+:root{
+  --bg:#FDFCF8;--panel:#FFFFFF;--ink:#1C2630;--muted:#56606A;--rule:#D3CFC4;--accent:#3C6FA6;
+  --sea:#CFE0EA;--land:#F3EFE3;--land-dim:#E9E5D9;--land-on:#FFFFFF;--border:#FFFFFF;
+  --c-bridge:#2F5E86;--c-rail:#6E4C94;--c-water:#3A9BC1;--c-port:#1F3E6E;--c-old:#6B4226;--c-tower:#D8533A;--c-modern:#A7801F;--c-post:#3A3F44;
+  --frame:#3C6FA6;--deep:#1F3E6E;--pop:#D9412B;
+  --f-disp:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--frame:#6F9FD3;--deep:#A9C6E8;--accent:#6F9FD3;--border:#46545E}}
+:root[data-theme="dark"]{--frame:#6F9FD3;--deep:#A9C6E8;--accent:#6F9FD3;--border:#46545E}
+body{border-top:6px solid var(--frame)}
+.eyebrow{display:none}
+header{border-bottom:4px solid var(--frame)}
+h1{color:var(--deep);font-weight:800}
+.chip{border-radius:0;border:1px solid var(--ink);font-weight:700}
+.chip[aria-pressed="true"]{background:var(--frame);border-color:var(--frame);color:#fff}
+.mapview{border:3px solid var(--frame)}
+.pref{stroke-width:1.6}
+.mappanel h2{color:var(--deep)}
+.detail{border:0;border-top:3px solid var(--frame)}
+.axis-box{border:0;border-top:3px solid var(--frame)}
+.axis-title{font-family:var(--f-disp);font-weight:800;font-size:16px;color:var(--deep);letter-spacing:.02em}
+.bar input[type=search],.bar select{border-radius:0;border-color:var(--ink)}
+.ledger{border-top:3px solid var(--frame)}
+.rgroup{background:var(--frame);color:#fff;letter-spacing:.06em;padding:6px 10px;margin-top:14px;border-bottom:0}
+.name{color:var(--ink)}
+.badge,.row.visited .name::after{border-radius:0}
+.badge{color:var(--pop)}
 </style>
 
 <div class="wrap">
