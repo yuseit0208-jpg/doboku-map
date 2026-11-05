@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>東京 土木建築散歩地図</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Cormorant+Garamond:ital,wght@1,600&display=swap">
+<style>
+/* 印刷冊子: A4横の見開き1枚ごとに、左に簡略地図・右に解説と写真枠。紙面は単一の明るい配色で固定。 */
+:root{
+  --paper:#FBFAF6; --land:#F2EEE2; --water:#C7DAE1; --park:#A8CBB2; --road:#D2CFC6; --road-major:#C3BFB5;
+  --rail:#7C8287; --ink:#1E2A3A; --muted:#5E6872; --navy:#2C4E8C; --star:#D8433F; --rule:#D9D5CA;
+  --c-bridge:#2F5E86; --c-rail:#7A4E9A; --c-water:#1F8077; --c-port:#4C6E2E; --c-tower:#B5462E; --c-modern:#8A6A1F; --c-post:#3A3F44;
+  --f-disp:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-latin:"Cormorant Garamond","Times New Roman",serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{background:#8E949A}
+body{margin:0;background:#8E949A;color:var(--ink);font-family:var(--f-body);font-size:9pt;line-height:1.6;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:A4 landscape;margin:0}
+.toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:center;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:#1E2A3A;color:#E8ECEF;font-size:13px}
+.toolbar button{font:500 13px var(--f-body);background:#E8ECEF;color:#1E2A3A;border:0;border-radius:4px;padding:6px 14px;cursor:pointer}
+.toolbar button:focus-visible{outline:2px solid #9CC1E6;outline-offset:2px}
+.toolbar .hint{opacity:.8}
+.sheets{display:grid;justify-content:center;gap:24px;padding:24px 0 48px}
+.sheet{width:297mm;height:210mm;background:var(--paper);position:relative;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.25);display:grid}
+.sheet::after{content:"";position:absolute;inset:6mm;border:0.6mm solid var(--navy);border-radius:2mm;pointer-events:none}
+@media print{
+  html,body{background:none}
+  .toolbar{display:none}
+  .sheets{display:block;padding:0}
+  .sheet{box-shadow:none;break-after:page;zoom:1!important}
+  .photo .ph-hint,.photo .ph-del{display:none}
+  .photo:not(.has){border-style:dashed}
+}
+/* 表紙 */
+.cover{grid-template-columns:1fr 1fr}
+.cover .art{position:relative;background:var(--land);overflow:hidden}
+.cover .art svg{position:absolute;inset:0;width:100%;height:100%}
+.cover .text{padding:22mm 18mm 18mm 16mm;display:grid;align-content:space-between}
+.cover .en{font-family:var(--f-latin);font-style:italic;font-weight:600;font-size:36pt;color:var(--navy);line-height:1;letter-spacing:.01em}
+.cover h1{font-family:var(--f-disp);font-weight:800;font-size:30pt;line-height:1.25;margin:4mm 0 0;text-wrap:balance}
+.cover .sub{font-size:10.5pt;color:var(--muted);margin-top:4mm;max-width:40em}
+.toc{display:grid;gap:2.5mm;margin:0;padding:0;list-style:none}
+.toc li{display:grid;grid-template-columns:9mm 1fr auto;align-items:baseline;border-bottom:0.2mm solid var(--rule);padding-bottom:1.5mm}
+.toc .p{font-family:var(--f-latin);font-style:italic;font-size:14pt;color:var(--navy)}
+.toc .t{font-family:var(--f-disp);font-weight:700;font-size:12pt}
+.toc .c{font-size:8.5pt;color:var(--muted)}
+.cover .photo{height:46mm}
+.cover .meta{font-size:8pt;color:var(--muted)}
+/* エリアページ */
+.area{grid-template-rows:auto minmax(0,1fr)}
+.band{display:grid;grid-template-columns:auto 1fr;gap:3mm 8mm;align-items:end;padding:11mm 12mm 3mm;border-bottom:0.3mm solid var(--navy);margin:0 6mm}
+.band h2{font-family:var(--f-disp);font-weight:800;font-size:22pt;line-height:1.1;margin:0;color:var(--ink)}
+.band .en{font-family:var(--f-latin);font-style:italic;font-size:13pt;color:var(--navy);display:block;margin-bottom:1mm}
+.band p{margin:0;font-size:8.6pt;color:var(--muted);max-width:60em}
+.body{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6mm;padding:4mm 12mm 11mm;min-height:0}
+.mapbox{height:100%;min-height:0;display:flex;align-items:flex-start}
+.mapbox svg{height:100%;width:auto;max-width:165mm;max-height:100%;display:block;border-radius:1.2mm;outline:0.2mm solid var(--rule)}
+.cards{display:grid;grid-template-columns:repeat(var(--cols,2),minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:2.2mm 4mm;min-height:0;align-content:stretch}
+.card{display:grid;grid-template-columns:var(--ph,19mm) minmax(0,1fr);gap:2.5mm;min-height:0;border-bottom:0.2mm solid var(--rule);padding-bottom:1.6mm;overflow:hidden}
+.card .photo{height:100%;min-height:14mm;max-height:26mm}
+.card h3{font-family:var(--f-disp);font-weight:800;font-size:9.4pt;line-height:1.3;margin:0;display:flex;gap:1.6mm;align-items:baseline}
+.card h3 .no{flex:none;display:inline-grid;place-items:center;width:4.6mm;height:4.6mm;border-radius:50%;background:var(--ink);color:#fff;font:700 6.8pt var(--f-body);transform:translateY(-.3mm)}
+.card .sp{font-size:6.9pt;color:var(--muted);line-height:1.45;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.card .sp b{font-weight:700;color:var(--c)}
+.card p{margin:.6mm 0 0;font-size:7.3pt;line-height:1.5;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:var(--clamp,2);overflow:hidden}
+.dense .card p{display:none}
+.folio{position:absolute;bottom:7.6mm;right:14mm;background:var(--paper);padding:0 1.5mm;font-family:var(--f-latin);font-style:italic;font-size:10pt;color:var(--navy);z-index:3}
+.folio.l{right:auto;left:12mm}
+/* 写真枠 */
+.photo{position:relative;display:block;border:0.3mm solid var(--rule);border-radius:1mm;background:repeating-linear-gradient(135deg,#F3F1EA 0 2mm,#ECE9E0 2mm 4mm);overflow:hidden;cursor:pointer}
+.photo.has{border-style:solid;background:#DDD}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo input{position:absolute;opacity:0;width:1px;height:1px}
+.photo .ph-hint{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-size:6.5pt;color:var(--muted);padding:1mm;line-height:1.3}
+.photo.has .ph-hint{display:none}
+.photo .ph-del{position:absolute;top:.8mm;right:.8mm;display:none;width:5mm;height:5mm;border-radius:50%;border:0;background:rgba(30,42,58,.8);color:#fff;font-size:8pt;line-height:5mm;padding:0;cursor:pointer}
+.photo.has:hover .ph-del,.photo.has:focus-within .ph-del{display:block}
+.photo:focus-within{outline:0.5mm solid var(--navy);outline-offset:0.4mm}
+/* 全体図 */
+.ov .body{grid-template-columns:auto minmax(0,1fr)}
+.ov .side{display:grid;align-content:start;gap:4mm;min-height:0}
+.ov h4{font-family:var(--f-disp);font-weight:800;font-size:10.5pt;margin:0 0 1.5mm;border-bottom:0.3mm solid var(--navy);padding-bottom:.8mm}
+.legend{display:flex;flex-wrap:wrap;gap:1.2mm 4mm;font-size:7.8pt}
+.legend span{display:inline-flex;gap:1.4mm;align-items:center}
+.legend i{width:2.6mm;height:2.6mm;border-radius:50%;background:var(--c)}
+.alist{display:grid;gap:2mm;margin:0;padding:0;list-style:none}
+.alist li{font-size:7.8pt;line-height:1.5}
+.alist b{font-family:var(--f-disp);font-size:9.5pt;margin-right:2mm}
+.outer{columns:2;column-gap:5mm;font-size:7.4pt;line-height:1.55;margin:0;padding:0;list-style:none}
+.outer li{break-inside:avoid}
+.outer small{color:var(--muted)}
+.note{font-size:7pt;color:var(--muted)}
+/* 地図の配色 */
+.tmap .m-land{fill:var(--land)}
+.tmap .m-water{fill:var(--water)}
+.tmap .m-park{fill:var(--park)}
+.tmap .m-road{fill:none;stroke:var(--road);stroke-linecap:round;stroke-linejoin:round}
+.tmap .m-primary,.tmap .m-trunk,.tmap .m-motorway{stroke:var(--road-major)}
+.tmap .m-rail{fill:none;stroke:var(--rail);stroke-width:2.6}
+.tmap .m-rail-dash{fill:none;stroke:var(--land);stroke-width:1.2;stroke-dasharray:6 6}
+.tmap .m-label{font:700 15px var(--f-disp);fill:#6C7A73;text-anchor:middle;paint-order:stroke;stroke:var(--land);stroke-width:4px;letter-spacing:.15em}
+.tmap .m-star{fill:var(--star);stroke:#fff;stroke-width:1.6}
+.tmap .m-no-bg{fill:var(--ink);stroke:#fff;stroke-width:1.5}
+.tmap .m-no{font:700 14px var(--f-body);fill:#fff;text-anchor:middle}
+.tmap .m-dot{stroke:#fff;stroke-width:1.4}
+.tmap .m-area rect{fill:rgba(44,78,140,.07);stroke:var(--navy);stroke-width:2.4;stroke-dasharray:8 4}
+.tmap .m-area text{font:800 17px var(--f-disp);fill:var(--navy);paint-order:stroke;stroke:var(--land);stroke-width:4px}
+.tmap .m-credit{font:10px var(--f-body);fill:#7C858C;text-anchor:end;paint-order:stroke;stroke:var(--land);stroke-width:3px}
+.tmap .m-scale path{fill:none;stroke:var(--ink);stroke-width:2}
+.tmap .m-scale text{font:600 11px var(--f-body);fill:var(--ink)}
+.tmap .m-north path{fill:var(--ink)}
+.tmap .m-north text{font:700 12px var(--f-body);fill:var(--ink);text-anchor:middle}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" id="printBtn">印刷・PDFに保存</button>
+  <span class="hint" id="hint">写真枠を押すと、自分で撮った写真を入れられます（このブラウザに保存）。印刷はA4横・余白なし・背景グラフィックありで。</span>
+</div>
+<main class="sheets" id="sheets"></main>
+
+<script src="tokyo-data.js" charset="utf-8"></script>
+<script src="tokyo-maps.js" charset="utf-8"></script>
+<script src="tokyo-mapdraw.js" charset="utf-8"></script>
+<script>
+(function(){
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const firstSentence=s=>{const i=s.indexOf("。");return i>0?s.slice(0,i+1):s};
+const photo=(key,hint)=>`<label class="photo" data-key="${key}"><input type="file" accept="image/*" id="ph-${key}"><span class="ph-hint">${hint||"写真を入れる"}</span><button type="button" class="ph-del" aria-label="写真を外す">×</button></label>`;
+const AREAS=TokyoMap.AREA_KEYS.filter(k=>TOKYO_MAPS[k]);
+const ov=TOKYO_MAPS.overview;
+let page=1;const sheets=[];
+
+// 表紙
+sheets.push(`<section class="sheet cover">
+  <div class="art">${ov?TokyoMap.svg("overview"):""}</div>
+  <div class="text">
+    <div>
+      <div class="en">Tokyo Civil Walks</div>
+      <h1>東京 土木建築<br>散歩地図</h1>
+      <div class="sub">『東京 土木建築名所帖』の別冊。橋・水門・駅舎・近代建築を、歩いて回れる4つのエリアに分けて地図にしました。</div>
+    </div>
+    ${photo("cover","表紙の写真を入れる")}
+    <ol class="toc">
+      <li><span class="p">2</span><span class="t">全体図</span><span class="c">収録${D.length}件の位置</span></li>
+      ${AREAS.map((k,i)=>`<li><span class="p">${i+3}</span><span class="t">${esc(TOKYO_MAPS[k].title)}</span><span class="c">${TokyoMap.spots(k).length}か所</span></li>`).join("")}
+    </ol>
+    <div class="meta">地図データ © OpenStreetMap contributors（ODbL）。見学可否・公開日は施設ごとに異なります。</div>
+  </div>
+</section>`);
+
+// 全体図
+if(ov){
+  const outside=D.filter(d=>!TokyoMap.inside(ov,d.ll));
+  sheets.push(`<section class="sheet area ov">
+    <header class="band"><h2><span class="en">${ov.en}</span>${ov.title}</h2><p>点の色は分類、破線の枠は詳細図のあるエリアです。都心から離れた名所は右の一覧にまとめました。</p></header>
+    <div class="body">
+      <div class="mapbox">${TokyoMap.svg("overview")}</div>
+      <div class="side">
+        <div><h4>分類</h4><div class="legend">${Object.entries(CATS).map(([k,c])=>`<span style="--c:var(${c.v})"><i></i>${c.l}</span>`).join("")}</div></div>
+        <div><h4>詳細図のエリア</h4><ol class="alist">${AREAS.map((k,i)=>`<li><b>${i+3}　${esc(TOKYO_MAPS[k].title)}</b>${esc(TOKYO_MAPS[k].lede||"")}</li>`).join("")}</ol></div>
+        <div><h4>地図の範囲外の名所</h4><ul class="outer">${outside.map(d=>`<li>${esc(d.name)} <small>${esc(d.area)}</small></li>`).join("")}</ul></div>
+        <p class="note">線状の施設（地下鉄・トンネル・上水など）は代表地点か範囲外の一覧に入れています。</p>
+      </div>
+    </div>
+    <div class="folio l">2</div>
+  </section>`);
+}
+
+// エリア
+AREAS.forEach((k,i)=>{
+  const m=TOKYO_MAPS[k],sp=TokyoMap.spots(k),n=sp.length;
+  const cols=n>14?3:2,dense=n>18;
+  sheets.push(`<section class="sheet area">
+    <header class="band"><h2><span class="en">${esc(m.en)}</span>${esc(m.title)}</h2><p>${esc(m.lede||"")}</p></header>
+    <div class="body">
+      <div class="mapbox">${TokyoMap.svg(k)}</div>
+      <div class="cards${dense?" dense":""}" style="--cols:${cols};--ph:${cols>2?"15mm":"19mm"}">
+        ${sp.map(s=>{const d=s.d;return `<article class="card" style="--c:var(${CATS[d.cat].v})">
+          ${photo(d.id)}
+          <div><h3><span class="no">${s.no}</span>${esc(d.name)}</h3>
+          <div class="sp"><b>${esc(d.yl)}</b>　${esc(d.spec)}</div>
+          <p>${esc(firstSentence(d.note))}</p></div></article>`}).join("")}
+      </div>
+    </div>
+    <div class="folio">${i+3}</div>
+  </section>`);
+});
+document.getElementById("sheets").innerHTML=sheets.join("");
+// 地図の縦横比を固定して余白を出さない／表紙は枠いっぱいに切り抜く
+document.querySelectorAll(".mapbox svg").forEach(s=>{const v=s.viewBox.baseVal;s.style.aspectRatio=v.width+" / "+v.height});
+document.querySelectorAll(".cover .art svg").forEach(s=>s.setAttribute("preserveAspectRatio","xMidYMid slice"));
+
+// 画面幅に合わせて縮小表示
+function fit(){const vw=document.documentElement.clientWidth-24;const mm=297*96/25.4;const z=Math.min(1,vw/mm);document.querySelectorAll(".sheet").forEach(s=>s.style.zoom=z)}
+fit();addEventListener("resize",fit);
+addEventListener("beforeprint",()=>document.querySelectorAll(".sheet").forEach(s=>s.style.zoom=1));
+addEventListener("afterprint",fit);
+
+// 写真枠
+const KEY="tk-photo-";
+function show(label,url){label.classList.toggle("has",!!url);let img=label.querySelector("img");if(url){if(!img){img=document.createElement("img");img.alt="";label.prepend(img)}img.src=url}else if(img)img.remove()}
+document.querySelectorAll(".photo").forEach(l=>{let v=null;try{v=localStorage.getItem(KEY+l.dataset.key)}catch(e){}if(v)show(l,v)});
+document.addEventListener("change",e=>{
+  const inp=e.target;if(!inp.matches(".photo input")||!inp.files[0])return;
+  const label=inp.closest(".photo"),fr=new FileReader();
+  fr.onload=()=>{const im=new Image();im.onload=()=>{const max=1100,r=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=im.width*r;c.height=im.height*r;c.getContext("2d").drawImage(im,0,0,c.width,c.height);const url=c.toDataURL("image/jpeg",.82);show(label,url);try{localStorage.setItem(KEY+label.dataset.key,url)}catch(err){}};im.src=fr.result};
+  fr.readAsDataURL(inp.files[0]);inp.value="";
+});
+document.addEventListener("click",e=>{const b=e.target.closest(".ph-del");if(!b)return;e.preventDefault();const l=b.closest(".photo");show(l,null);try{localStorage.removeItem(KEY+l.dataset.key)}catch(err){}});
+
+// 印刷（埋め込み表示では印刷ダイアログを開けないので案内に切り替える）
+const framed=(()=>{try{return window.self!==window.top}catch(e){return true}})();
+const btn=document.getElementById("printBtn");
+if(framed){btn.hidden=true;document.getElementById("hint").textContent="印刷は、手元の booklet.html をブラウザで直接開いて行ってください。写真枠を押すと自分の写真を入れられます。"}
+else btn.onclick=()=>window.print();
+})();
+</script>
+</body>
+</html>

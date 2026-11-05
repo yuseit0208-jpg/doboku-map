@@ -1,0 +1,354 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>東京 土木建築名所帖</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 測量台帳のような一覧。上に年代軸（実スケール）、その下にフィルタと台帳行。 */
+:root{
+  --bg:#ECEEEB;        /* コンクリート打放しのグレー（わずかに緑寄り） */
+  --panel:#F6F7F4;
+  --ink:#1C2630;
+  --muted:#5F6B72;
+  --rule:#C9CEC9;
+  --accent:#2F5E86;    /* 青焼き図面の青 */
+  --c-bridge:#2F5E86; --c-rail:#7A4E9A; --c-water:#1F8077; --c-port:#4C6E2E;
+  --c-tower:#B5462E; --c-modern:#8A6A1F; --c-post:#3A3F44;
+  --f-disp:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151A1E;--panel:#1C2328;--ink:#E3E7E4;--muted:#97A3A8;--rule:#2F3940;--accent:#7FB1DB;
+  --c-bridge:#7FB1DB;--c-rail:#B79AD6;--c-water:#5CC2B5;--c-port:#9BC173;--c-tower:#E58569;--c-modern:#D4B467;--c-post:#B9C0C5;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151A1E;--panel:#1C2328;--ink:#E3E7E4;--muted:#97A3A8;--rule:#2F3940;--accent:#7FB1DB;
+  --c-bridge:#7FB1DB;--c-rail:#B79AD6;--c-water:#5CC2B5;--c-port:#9BC173;--c-tower:#E58569;--c-modern:#D4B467;--c-post:#B9C0C5;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:28px}
+header{display:grid;gap:6px;border-bottom:2px solid var(--ink);padding-bottom:18px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+h1{font-family:var(--f-disp);font-weight:800;font-size:clamp(30px,5vw,48px);line-height:1.15;margin:0;text-wrap:balance}
+.lede{margin:0;color:var(--muted);max-width:62ch}
+.stats{display:flex;flex-wrap:wrap;gap:6px 22px;font-family:var(--f-mono);font-size:13px;color:var(--muted);margin-top:6px}
+.stats b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+
+/* 年代軸 */
+.axis-box{background:var(--panel);border:1px solid var(--rule);padding:16px 16px 8px;overflow-x:auto}
+.axis-title{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.08em;margin-bottom:8px}
+.axis{position:relative;min-width:640px;height:120px}
+.axis .base{position:absolute;left:0;right:0;bottom:22px;border-top:1px solid var(--ink)}
+.tick{position:absolute;bottom:0;transform:translateX(-50%);font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tick::before{content:"";position:absolute;left:50%;bottom:16px;height:6px;border-left:1px solid var(--ink)}
+.dot{position:absolute;width:9px;height:9px;border-radius:50%;transform:translateX(-50%);border:0;padding:0;cursor:pointer;background:var(--c)}
+.dot.dim{opacity:.18}
+.dot:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.axis-note{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* 隅田川 */
+.river{display:grid;gap:12px}
+.river-head{display:grid;gap:6px}
+.river h2{font-family:var(--f-disp);font-weight:800;font-size:24px;margin:0}
+.river-head p{margin:0;max-width:65ch;color:var(--muted);font-size:14px}
+.river-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.river-legend span{display:inline-flex;align-items:center;gap:6px}
+.river-legend i{width:16px;height:4px;background:var(--e)}
+.river-scroll{overflow-x:auto;border-block:1px solid var(--rule);padding-block:14px}
+.river-line{list-style:none;margin:0;padding:0 4px;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(118px,1fr);position:relative;min-width:max-content}
+.river-line::before{content:"";position:absolute;left:0;right:0;top:34px;height:10px;background:color-mix(in srgb,var(--c-bridge) 22%,transparent);border-block:1px solid color-mix(in srgb,var(--c-bridge) 45%,transparent)}
+.stop{position:relative;display:grid;justify-items:center;text-align:center;gap:4px;padding:0 6px;cursor:pointer;border:0;background:none;color:var(--ink);font:inherit}
+.stop .n{font-family:var(--f-mono);font-size:11px;color:var(--muted);height:18px}
+.stop .deck{width:6px;height:30px;background:var(--e);position:relative;z-index:1}
+.stop .nm{font-family:var(--f-disp);font-weight:800;font-size:15px;line-height:1.3}
+.stop .ty{font-size:11.5px;color:var(--muted);line-height:1.4}
+.stop .y{font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums}
+.stop .y.fukko{color:var(--c-tower)}
+.stop:hover .nm,.stop:focus-visible .nm{color:var(--accent)}
+.stop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.river-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+/* 散歩地図 */
+:root{--m-land:#F2EEE2;--m-water:#C7DAE1;--m-park:#A8CBB2;--m-road:#D6D3CA;--m-road2:#C3BFB5;--m-rail:#7C8287;--m-star:#D8433F;--m-label:#6C7A73;--m-navy:#2C4E8C}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#8DB3E6}}
+:root[data-theme="dark"]{--m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#8DB3E6}
+.mapsec{display:grid;gap:12px}
+.mapsec .river-head a{color:var(--accent)}
+.maptabs{display:flex;flex-wrap:wrap;gap:8px}
+.mapgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:760px){.mapgrid{grid-template-columns:minmax(0,1fr)}}
+.mapview{min-width:0;border:1px solid var(--rule);background:var(--m-land);line-height:0}
+.mapview svg{width:100%;height:auto;max-height:78vh;display:block}
+.mappanel{min-width:0;display:grid;gap:10px;align-content:start}
+.mappanel h3{font-family:var(--f-disp);font-weight:800;font-size:20px;margin:0;line-height:1.3}
+.mappanel .lede{margin:0;font-size:13.5px;color:var(--muted)}
+.spotlist{list-style:none;margin:0;padding:0;display:grid;border-top:1px solid var(--rule);max-height:52vh;overflow:auto}
+.spotlist button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--rule);cursor:pointer;font-size:14px}
+.spotlist button:hover .nm,.spotlist button[aria-current="true"] .nm{color:var(--accent)}
+.spotlist button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.spotlist .no{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);font:700 12px var(--f-body)}
+.spotlist .yr2{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.spotlist .ok{color:var(--c-water);font-size:11px;margin-left:6px}
+.detail{border:1px solid var(--rule);background:var(--panel);padding:12px 14px;display:grid;gap:4px}
+.detail .actions{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin-top:4px}
+.detail .actions a,.detail .actions button{all:unset;color:var(--accent);border-bottom:1px solid currentColor;cursor:pointer}
+.detail .actions :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tmap .m-land{fill:var(--m-land)}
+.tmap .m-water{fill:var(--m-water)}
+.tmap .m-park{fill:var(--m-park)}
+.tmap .m-road{fill:none;stroke:var(--m-road);stroke-linecap:round;stroke-linejoin:round}
+.tmap .m-primary,.tmap .m-trunk,.tmap .m-motorway{stroke:var(--m-road2)}
+.tmap .m-rail{fill:none;stroke:var(--m-rail);stroke-width:2.6}
+.tmap .m-rail-dash{fill:none;stroke:var(--m-land);stroke-width:1.2;stroke-dasharray:6 6}
+.tmap .m-label{font:700 15px var(--f-disp);fill:var(--m-label);text-anchor:middle;paint-order:stroke;stroke:var(--m-land);stroke-width:4px;letter-spacing:.15em}
+.tmap .m-star{fill:var(--m-star);stroke:var(--m-land);stroke-width:1.6}
+.tmap .m-no-bg{fill:var(--ink);stroke:var(--m-land);stroke-width:1.5}
+.tmap .m-no{font:700 14px var(--f-body);fill:var(--bg);text-anchor:middle}
+.tmap .m-dot{stroke:var(--m-land);stroke-width:1.4}
+.tmap .m-area rect{fill:color-mix(in srgb,var(--m-navy) 8%,transparent);stroke:var(--m-navy);stroke-width:2.4;stroke-dasharray:8 4}
+.tmap .m-area text{font:800 17px var(--f-disp);fill:var(--m-navy);paint-order:stroke;stroke:var(--m-land);stroke-width:4px}
+.tmap .m-credit{font:10px var(--f-body);fill:var(--m-label);text-anchor:end}
+.tmap .m-scale path{fill:none;stroke:var(--ink);stroke-width:2}
+.tmap .m-scale text{font:600 11px var(--f-body);fill:var(--ink)}
+.tmap .m-north path{fill:var(--ink)}
+.tmap .m-north text{font:700 12px var(--f-body);fill:var(--ink);text-anchor:middle}
+.tmap .m-hit{cursor:pointer}
+.tmap .m-hit:focus{outline:none}
+.tmap .m-hit:focus-visible .m-star,.tmap .m-dot.m-hit:focus-visible{stroke:var(--accent);stroke-width:4}
+.tmap .m-area.m-hit:hover rect,.tmap .m-area.m-hit:focus-visible rect{stroke-width:4}
+.tmap .m-spot.is-sel .m-star{stroke:var(--ink);stroke-width:2.4}
+/* フィルタ */
+.controls{display:grid;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:500 13px var(--f-body);border:1px solid var(--rule);background:transparent;color:var(--ink);padding:5px 12px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c,var(--ink))}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,.row a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bar input[type=search],.bar select{font:14px var(--f-body);color:var(--ink);background:var(--panel);border:1px solid var(--rule);padding:7px 10px;border-radius:4px}
+.bar input[type=search]{flex:1 1 220px;min-width:0}
+.bar label.tog{font-size:13px;color:var(--muted);display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-left:auto}
+
+/* 台帳 */
+.ledger{display:grid;border-top:1px solid var(--ink)}
+.row{display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:4px 18px;padding:14px 0;border-bottom:1px solid var(--rule);align-items:start}
+.row.flash{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.yr{font-family:var(--f-mono);font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3;color:var(--c)}
+.yr small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.main{min-width:0;display:grid;gap:2px}
+.name{font-family:var(--f-disp);font-weight:800;font-size:19px;line-height:1.35;margin:0}
+.meta{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 12px}
+.meta .cat{color:var(--c);font-weight:700}
+.spec{font-family:var(--f-mono);font-size:12.5px;color:var(--ink);margin-top:2px}
+.note{margin:2px 0 0;font-size:14px;max-width:65ch}
+.badge{display:inline-block;font-size:11px;border:1px solid currentColor;padding:0 6px;border-radius:3px;margin-left:6px;vertical-align:2px;color:var(--c-tower);font-family:var(--f-body);font-weight:500}
+.side{display:grid;gap:8px;justify-items:end;font-size:13px}
+.side a{color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor;white-space:nowrap}
+.side label{display:inline-flex;gap:6px;align-items:center;color:var(--muted);cursor:pointer;white-space:nowrap}
+.row.visited .name::after{content:"訪問済";font:500 11px var(--f-body);color:var(--c-water);border:1px solid currentColor;border-radius:3px;padding:0 5px;margin-left:8px;vertical-align:3px}
+.empty{padding:28px 0;color:var(--muted)}
+footer{font-size:12px;color:var(--muted);border-top:1px solid var(--rule);padding-top:14px;max-width:70ch}
+@media (max-width:620px){
+  .row{grid-template-columns:62px minmax(0,1fr)}
+  .yr{font-size:16px}
+  .side{grid-column:2;justify-items:start;grid-auto-flow:column;justify-content:start;gap:16px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Tokyo Civil Engineering &amp; Architecture Ledger</div>
+    <h1>東京 土木建築名所帖</h1>
+    <p class="lede">江戸の上水と石垣から、震災復興橋梁、戦後の構造表現、現代の超高層と地下インフラまで。東京都内で実際に見に行ける土木・建築の名所を、竣工年・構造・設計者とともに台帳にまとめました。</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <section class="axis-box" aria-label="竣工年の分布">
+    <div class="axis-title">竣工年の分布（1600–2030 / 点を押すと該当行へ）</div>
+    <div class="axis" id="axis"><div class="base"></div></div>
+    <div class="axis-note">点の色は分類。関東大震災（1923）後の復興事業と、1964年東京五輪前後に集中しているのが読み取れます。</div>
+  </section>
+
+  <section class="river" aria-labelledby="river-h">
+    <div class="river-head">
+      <h2 id="river-h">隅田川橋梁群</h2>
+      <p>上流の千住大橋から河口の築地大橋まで、収録した17橋を川の順に並べました。関東大震災後の帝都復興事業では、橋ごとに違う形式を選んで架け替えたため、アーチ・吊橋・跳開橋・ゲルバー桁が一本の川に並んでいます。</p>
+      <div class="river-legend" id="river-legend"></div>
+    </div>
+    <div class="river-scroll"><ol class="river-line" id="river-line"></ol></div>
+    <div class="river-foot"><span>↑ 上流（北区・足立区側）</span><button type="button" class="chip" id="onlySumida" aria-pressed="false">隅田川の橋だけを台帳に表示</button><span>河口（東京湾）↓</span></div>
+  </section>
+
+  <section class="mapsec" aria-labelledby="map-h">
+    <div class="river-head">
+      <h2 id="map-h">散歩地図</h2>
+      <p>全体図と、歩いて回れる4つのエリアの詳細図。星か一覧の名前を押すと解説が出ます。同じ地図を<a href="booklet.html">印刷用の冊子</a>にもまとめています。</p>
+    </div>
+    <div class="maptabs" role="tablist" id="maptabs"></div>
+    <div class="mapgrid">
+      <div class="mapview" id="mapview"></div>
+      <aside class="mappanel" id="mappanel" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <section class="controls" aria-label="絞り込み">
+    <div class="chips" id="chips"></div>
+    <div class="bar">
+      <input type="search" id="q" placeholder="名称・設計者・区市町村で検索" aria-label="検索">
+      <select id="sort" aria-label="並び順">
+        <option value="year">竣工年が古い順</option>
+        <option value="yearDesc">竣工年が新しい順</option>
+        <option value="cat">分類順</option>
+      </select>
+      <label class="tog"><input type="checkbox" id="onlyPending"> 未訪問のみ</label>
+      <span class="count" id="count"></span>
+    </div>
+  </section>
+
+  <section class="ledger" id="ledger" aria-live="polite"></section>
+
+  <footer>
+    竣工年は主に供用・開業・完成の年。重文＝国指定重要文化財。訪問済のチェックはこのブラウザにだけ保存されます。見学可否・公開日は施設ごとに異なるため、出かける前に公式情報を確認してください。
+  </footer>
+</div>
+
+<script src="tokyo-data.js" charset="utf-8"></script>
+<script src="tokyo-maps.js" charset="utf-8"></script>
+<script src="tokyo-mapdraw.js" charset="utf-8"></script>
+<script>
+/* データは tokyo-data.js */
+
+const $=s=>document.querySelector(s);
+const store={get(){try{return JSON.parse(localStorage.getItem("tk-visited")||"[]")}catch(e){return[]}},
+  set(a){try{localStorage.setItem("tk-visited",JSON.stringify(a))}catch(e){}}};
+let visited=new Set(store.get());
+const active=new Set(Object.keys(CATS));
+const col=c=>`var(${CATS[c].v})`;
+
+// chips
+const chips=$("#chips");
+const allBtn=document.createElement("button");
+allBtn.className="chip";allBtn.id="chip-all";allBtn.textContent="すべて";
+allBtn.onclick=()=>{const all=active.size===Object.keys(CATS).length;active.clear();if(!all)Object.keys(CATS).forEach(k=>active.add(k));render()};
+chips.appendChild(allBtn);
+for(const [k,c] of Object.entries(CATS)){
+  const b=document.createElement("button");b.className="chip";b.id="chip-"+k;b.dataset.k=k;
+  b.style.setProperty("--c",col(k));b.innerHTML=`<i></i>${c.l}`;
+  b.onclick=()=>{active.has(k)?active.delete(k):active.add(k);render()};
+  chips.appendChild(b);
+}
+
+// axis
+const axis=$("#axis"),Y0=1600,Y1=2030,pct=y=>(y-Y0)/(Y1-Y0)*100;
+for(let y=1600;y<=2025;y+=50){const t=document.createElement("span");t.className="tick";t.style.left=pct(y)+"%";t.textContent=y;axis.appendChild(t)}
+const bins={};
+[...D].sort((a,b)=>a.year-b.year).forEach(d=>{
+  const k=Math.round(d.year/6);const n=bins[k]=(bins[k]||0)+1;
+  const b=document.createElement("button");b.className="dot";b.dataset.id=d.id;b.dataset.cat=d.cat;
+  b.style.left=pct(d.year)+"%";b.style.bottom=(28+(n-1)*11)+"px";b.style.setProperty("--c",col(d.cat));
+  b.title=`${d.yl} ${d.name}`;b.setAttribute("aria-label",`${d.yl} ${d.name}`);
+  b.onclick=()=>jump(d.id);
+  axis.appendChild(b);
+});
+axis.style.height=(28+Math.max(...Object.values(bins))*11+12)+"px";
+
+// 隅田川の帯
+const TYPES=[["アーチ",/アーチ/,"var(--c-bridge)"],["吊橋",/吊橋/,"var(--c-water)"],["跳開橋",/跳開/,"var(--c-tower)"],["斜張橋",/斜張/,"var(--c-rail)"],["桁橋",/桁|二層|X字/,"var(--c-post)"]];
+const typeOf=s=>TYPES.find(t=>t[1].test(s))||TYPES[4];
+$("#river-legend").innerHTML=TYPES.map(t=>`<span style="--e:${t[2]}"><i></i>${t[0]}</span>`).join("")+`<span>年が赤＝震災復興期（1924–1932）</span>`;
+function jump(id){const r=document.getElementById(id);if(!r)return;r.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});r.classList.add("flash");setTimeout(()=>r.classList.remove("flash"),1600)}
+$("#river-line").innerHTML=D.filter(d=>d.sm!==null).sort((a,b)=>a.sm-b.sm).map(d=>{const t=typeOf(d.spec);return `
+  <li><button type="button" class="stop" data-id="${d.id}" style="--e:${t[2]}" aria-label="${d.name}（${d.year}年・${t[0]}）を台帳で見る">
+    <span class="n">${String(d.sm+1).padStart(2,"0")}</span><span class="deck"></span>
+    <span class="nm">${d.name}</span><span class="ty">${t[0]}</span>
+    <span class="y${d.year>=1924&&d.year<=1932?" fukko":""}">${d.year}</span></button></li>`}).join("");
+$("#river-line").addEventListener("click",e=>{const b=e.target.closest(".stop");if(!b)return;
+  if(!rowVisible(b.dataset.id)){active.add("bridge");$("#q").value="";$("#onlyPending").checked=false;render()}jump(b.dataset.id)});
+const rowVisible=id=>!!document.getElementById(id);
+let onlySumida=false;
+$("#onlySumida").addEventListener("click",()=>{onlySumida=!onlySumida;$("#onlySumida").setAttribute("aria-pressed",onlySumida);if(onlySumida)active.add("bridge");render()});
+
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function render(){
+  const q=$("#q").value.trim().toLowerCase(),only=$("#onlyPending").checked,sort=$("#sort").value;
+  allBtn.setAttribute("aria-pressed",active.size===Object.keys(CATS).length);
+  chips.querySelectorAll("[data-k]").forEach(b=>b.setAttribute("aria-pressed",active.has(b.dataset.k)));
+  const order=Object.keys(CATS);
+  let rows=D.filter(d=>active.has(d.cat)&&(!onlySumida||d.sm!==null)&&(!only||!visited.has(d.id))&&(!q||(d.name+d.by+d.area+d.spec+d.note).toLowerCase().includes(q)));
+  rows.sort(onlySumida?(a,b)=>a.sm-b.sm:sort==="yearDesc"?(a,b)=>b.year-a.year:sort==="cat"?(a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat)||a.year-b.year:(a,b)=>a.year-b.year);
+  const shown=new Set(rows.map(r=>r.id));
+  axis.querySelectorAll(".dot").forEach(b=>b.classList.toggle("dim",!shown.has(b.dataset.id)));
+  $("#count").textContent=`${rows.length} / ${D.length} 件`;
+  $("#ledger").innerHTML=rows.length?rows.map(d=>`
+    <article class="row${visited.has(d.id)?" visited":""}" id="${d.id}" style="--c:${col(d.cat)}">
+      <div class="yr">${d.year}<small>${esc(d.yl)}</small></div>
+      <div class="main">
+        <h2 class="name">${esc(d.name)}${d.badge?`<span class="badge">${d.badge}</span>`:""}</h2>
+        <div class="meta"><span class="cat">${CATS[d.cat].l}</span><span>${esc(d.area)}</span><span>${esc(d.by)}</span></div>
+        <div class="spec">${esc(d.spec)}</div>
+        <p class="note">${esc(d.note)}</p>
+      </div>
+      <div class="side">
+        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.name.replace(/（.*?）/g,"")+" 東京")}" target="_blank" rel="noopener">地図で見る ↗</a>
+        <label><input type="checkbox" id="v-${d.id}" data-id="${d.id}" ${visited.has(d.id)?"checked":""}> 訪問済</label>
+      </div>
+    </article>`).join(""):`<div class="empty">条件に合う名所がありません。分類や検索語を変えてみてください。</div>`;
+  const bc=Object.keys(CATS).map(k=>`${CATS[k].l.replace(/（.*）/,"")} <b>${D.filter(d=>d.cat===k).length}</b>`).join("　");
+  $("#stats").innerHTML=`収録 <b>${D.length}</b> 件<span>訪問済 <b>${visited.size}</b></span><span>${bc}</span>`;
+}
+$("#ledger").addEventListener("change",e=>{const id=e.target.dataset.id;if(!id)return;e.target.checked?visited.add(id):visited.delete(id);store.set([...visited]);
+  e.target.closest(".row").classList.toggle("visited",e.target.checked);if($("#onlyPending").checked)render();else{render()}});
+["q","sort","onlyPending"].forEach(id=>$("#"+id).addEventListener("input",render));
+render();
+
+// 散歩地図
+(function(){
+  if(!window.TOKYO_MAPS||!window.TokyoMap)return;
+  const keys=["overview",...TokyoMap.AREA_KEYS].filter(k=>TOKYO_MAPS[k]);
+  let cur="overview",sel=null;
+  try{const k=localStorage.getItem("tk-map");if(keys.includes(k))cur=k}catch(e){}
+  const tabs=$("#maptabs"),view=$("#mapview"),panel=$("#mappanel");
+  tabs.innerHTML=keys.map(k=>`<button type="button" class="chip" role="tab" id="mt-${k}" data-k="${k}">${esc(TOKYO_MAPS[k].title)}</button>`).join("");
+  const byId=id=>D.find(d=>d.id===id);
+  function showLedger(id){if(!document.getElementById(id)){Object.keys(CATS).forEach(k=>active.add(k));$("#q").value="";$("#onlyPending").checked=false;onlySumida=false;$("#onlySumida").setAttribute("aria-pressed","false");render()}jump(id)}
+  function detail(d,no){
+    return `<div class="detail" style="--c:${col(d.cat)}">
+      <div class="meta"><span class="cat">${CATS[d.cat].l}</span><span>${esc(d.area)}</span><span>${esc(d.yl)}</span></div>
+      <h3>${no?no+"　":""}${esc(d.name)}${d.badge?`<span class="badge">${d.badge}</span>`:""}</h3>
+      <div class="spec">${esc(d.spec)}　/　${esc(d.by)}</div>
+      <p class="note">${esc(d.note)}</p>
+      <div class="actions"><button type="button" data-ledger="${d.id}">台帳で見る</button><a href="https://www.google.com/maps/search/?api=1&query=${d.ll?d.ll.join(","):encodeURIComponent(d.name)}" target="_blank" rel="noopener">Googleマップ ↗</a></div>
+    </div>`}
+  function draw(){
+    tabs.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===cur));
+    view.innerHTML=TokyoMap.svg(cur,{interactive:true,selected:sel});
+    const m=TOKYO_MAPS[cur];
+    if(cur==="overview"){
+      const d=sel&&byId(sel);
+      panel.innerHTML=`<h3>${esc(m.title)}</h3><p class="lede">点は分類ごとの色。破線の枠を押すとそのエリアの詳細図に切り替わります。</p>`+
+        (d?detail(d):"")+
+        `<ul class="spotlist">${TokyoMap.AREA_KEYS.filter(k=>TOKYO_MAPS[k]).map(k=>`<li><button type="button" data-area="${k}"><span class="no">${TokyoMap.AREA_KEYS.indexOf(k)+1}</span><span class="nm">${esc(TOKYO_MAPS[k].title)}</span><span class="yr2">${TokyoMap.spots(k).length}か所</span></button></li>`).join("")}</ul>`;
+    }else{
+      const sp=TokyoMap.spots(cur),s=sp.find(x=>x.d.id===sel);
+      panel.innerHTML=`<h3>${esc(m.title)}</h3><p class="lede">${esc(m.lede||"")}</p>`+(s?detail(s.d,s.no):"")+
+        `<ul class="spotlist">${sp.map(x=>`<li><button type="button" data-id="${x.d.id}" aria-current="${x.d.id===sel}"><span class="no">${x.no}</span><span class="nm">${esc(x.d.name)}${visited.has(x.d.id)?'<span class="ok">訪問済</span>':""}</span><span class="yr2">${x.d.year}</span></button></li>`).join("")}</ul>`;
+    }
+  }
+  function pick(id){sel=sel===id?null:id;draw();const b=view.querySelector(`[data-id="${id}"]`);if(b&&document.activeElement&&view.contains(document.activeElement))b.focus()}
+  function go(k){cur=k;sel=null;try{localStorage.setItem("tk-map",k)}catch(e){}draw()}
+  tabs.addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(b)go(b.dataset.k)});
+  function act(e){
+    const a=e.target.closest("[data-area]");if(a){go(a.dataset.area);return true}
+    const h=e.target.closest("[data-id]");if(h){pick(h.dataset.id);return true}
+    const l=e.target.closest("[data-ledger]");if(l){showLedger(l.dataset.ledger);return true}
+    return false}
+  view.addEventListener("click",act);panel.addEventListener("click",act);
+  view.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&act(e))e.preventDefault()});
+  draw();
+})();
+</script>
+
+</body></html>

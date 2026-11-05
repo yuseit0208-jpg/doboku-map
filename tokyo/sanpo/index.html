@@ -1,0 +1,706 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>東京 土木散歩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F0E5;--paper:#FFFDF7;--ink:#1F2326;--ink2:#5C6368;--ink3:#8A9094;--rule:#DCD5C4;--accent:#D8433F;--ok:#1F8077;--me:#2F6FD6;
+  --c-bridge:#2F5E86;--c-rail:#7A4E9A;--c-water:#1F8077;--c-port:#4C6E2E;--c-tower:#B5462E;--c-modern:#8A6A1F;--c-post:#3A3F44;
+  --m-land:#F2EEE2;--m-water:#C7DAE1;--m-park:#A8CBB2;--m-road:#D6D3CA;--m-road2:#C3BFB5;--m-rail:#7C8287;--m-star:#D8433F;--m-label:#6C7A73;--m-navy:#2C4E8C;
+  --f-disp:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --tabh:62px;--safe-b:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#171C20;--paper:#1F262B;--ink:#E8E6E0;--ink2:#A9B0B4;--ink3:#7C858A;--rule:#343E45;--accent:#F06A5E;--ok:#5CC2B5;--me:#6FA3F5;
+  --c-bridge:#7FB1DB;--c-rail:#B79AD6;--c-water:#5CC2B5;--c-port:#9BC173;--c-tower:#E58569;--c-modern:#D4B467;--c-post:#B9C0C5;
+  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#8DB3E6;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#171C20;--paper:#1F262B;--ink:#E8E6E0;--ink2:#A9B0B4;--ink3:#7C858A;--rule:#343E45;--accent:#F06A5E;--ok:#5CC2B5;--me:#6FA3F5;
+  --c-bridge:#7FB1DB;--c-rail:#B79AD6;--c-water:#5CC2B5;--c-port:#9BC173;--c-tower:#E58569;--c-modern:#D4B467;--c-post:#B9C0C5;
+  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#8DB3E6;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body);-webkit-tap-highlight-color:transparent;padding-bottom:calc(var(--tabh) + var(--safe-b))}
+button{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.top .wrap{display:flex;align-items:center;gap:12px;height:56px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.brand svg{flex:none}
+.brand b{font:800 19px/1.1 var(--f-disp);letter-spacing:.06em;white-space:nowrap}
+.brand small{display:block;font-size:11px;color:var(--ink2);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog{flex:none;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2)}
+.prog .ring{width:34px;height:34px}
+.prog .ring circle{fill:none;stroke-width:4}
+.prog .ring .bgc{stroke:var(--rule)}
+.prog .ring .fgc{stroke:var(--accent);stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .4s}
+.prog strong{color:var(--ink);font-size:16px;font-variant-numeric:tabular-nums}
+
+/* views */
+.view{display:none;padding:14px 0 24px}
+.view.on{display:block}
+h2{font:800 20px/1.3 var(--f-disp);letter-spacing:.05em;margin:4px 0 10px}
+.muted{color:var(--ink2)}
+.small{font-size:12.5px}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px;margin:0 -16px;padding-inline:16px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--rule);background:var(--paper);border-radius:999px;padding:6px 14px;font-size:13.5px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .cnt{font-size:11.5px;opacity:.75;font-variant-numeric:tabular-nums}
+.chip i{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+/* map */
+.maplay{display:grid;gap:14px}
+@media (min-width:900px){.maplay{grid-template-columns:minmax(0,1fr) 340px;align-items:start}}
+.mapbox{position:relative;height:min(64dvh,620px);min-height:320px;border:1px solid var(--rule);border-radius:14px;overflow:hidden;background:var(--m-land);touch-action:none;user-select:none;-webkit-user-select:none}
+.mapbox svg{display:block;width:100%;height:100%;cursor:grab}
+.mapbox svg:active{cursor:grabbing}
+.mapbox .credit{position:absolute;right:8px;bottom:6px;font-size:10px;color:var(--m-label);background:color-mix(in srgb,var(--m-land) 80%,transparent);padding:0 4px;border-radius:3px;pointer-events:none}
+.mapbox .band{position:absolute;left:10px;top:10px;right:64px;pointer-events:none}
+.mapbox .band b{display:inline-block;background:var(--m-navy);color:#fff;font:800 15px/1 var(--f-disp);letter-spacing:.1em;padding:8px 12px;border-radius:4px}
+:root[data-theme="dark"] .mapbox .band b{color:#10161A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mapbox .band b{color:#10161A}}
+.mapbox .band span{display:block;margin-top:4px;font-size:11px;color:var(--m-navy);letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+.ctrls{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.ctrl{width:42px;height:42px;border-radius:10px;border:1px solid var(--rule);background:var(--paper);display:grid;place-items:center;cursor:pointer;box-shadow:0 1px 3px rgb(0 0 0 / .08)}
+.ctrl svg{width:20px;height:20px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ctrl.busy svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tmap .m-land{fill:var(--m-land)}.tmap .m-water{fill:var(--m-water)}.tmap .m-park{fill:var(--m-park)}
+.tmap .m-road{fill:none;stroke:var(--m-road);stroke-linecap:round;stroke-linejoin:round}
+.tmap .m-primary,.tmap .m-trunk,.tmap .m-motorway{stroke:var(--m-road2)}
+.tmap .m-rail{fill:none;stroke:var(--m-rail);stroke-width:2.6}
+.tmap .m-rail-dash{fill:none;stroke:var(--m-land);stroke-width:1.2;stroke-dasharray:6 6}
+.lbl{font:700 13px var(--f-disp);fill:var(--m-label);text-anchor:middle;paint-order:stroke;stroke:var(--m-land);stroke-width:3.5px;letter-spacing:.15em;pointer-events:none}
+.area rect{fill:color-mix(in srgb,var(--m-navy) 8%,transparent);stroke:var(--m-navy);stroke-dasharray:8 4}
+.area text{font:800 13px var(--f-disp);fill:var(--m-navy);paint-order:stroke;stroke:var(--m-land);stroke-width:3.5px}
+.area{cursor:pointer}
+.mk{cursor:pointer}
+.mk .star{fill:var(--m-star);stroke:var(--m-land);stroke-width:1.5}
+.mk .ph{stroke:var(--m-land);stroke-width:3}
+.mk .noc{fill:var(--ink);stroke:var(--m-land);stroke-width:1.5}
+.mk .not{font:700 11px var(--f-body);fill:var(--bg);text-anchor:middle}
+.mk .dot{stroke:var(--m-land);stroke-width:1.5}
+.mk.sel .star{stroke:var(--ink);stroke-width:2}
+.mk.sel .ph{stroke:var(--accent);stroke-width:4}
+.me .halo{fill:color-mix(in srgb,var(--me) 22%,transparent)}
+.me .pt{fill:var(--me);stroke:#fff;stroke-width:2.5}
+
+/* list (side of map + spots view) */
+.panel{background:var(--paper);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+.panel-h{padding:12px 14px 8px;border-bottom:1px solid var(--rule)}
+.panel-h p{margin:4px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.6}
+@media (min-width:900px){.panel.side{max-height:min(64dvh,620px);display:flex;flex-direction:column}.panel.side .rows{overflow:auto}}
+.rows{list-style:none;margin:0;padding:0}
+.rowb{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:10px 14px;border:0;border-bottom:1px solid var(--rule);background:none;cursor:pointer}
+.rows li:last-child .rowb{border-bottom:0}
+.rowb:hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.rowb.sel{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.thumb{flex:none;width:56px;height:56px;border-radius:9px;overflow:hidden;position:relative;display:grid;place-items:center;border:1.5px dashed var(--rule);color:var(--ink3)}
+.thumb.has{border:0}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.thumb .no{position:absolute;left:3px;top:3px;min-width:20px;height:20px;border-radius:10px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 5px}
+.rt{min-width:0;flex:1}
+.rt b{display:block;font-weight:700;font-size:14.5px;line-height:1.4}
+.rt span{display:block;font-size:12px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink2)}
+.tag i{width:8px;height:8px;border-radius:50%}
+.got{flex:none;font-size:11px;font-weight:700;color:var(--ok);border:1px solid currentColor;border-radius:4px;padding:1px 6px}
+.dist{flex:none;font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
+
+/* spots view tools */
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.search{flex:1 1 220px;min-width:0;height:42px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);padding:0 12px;font:inherit;color:var(--ink)}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:var(--paper)}
+.seg button{border:0;background:none;padding:0 12px;height:40px;font-size:13px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+select.sort{height:42px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);color:var(--ink);font:inherit;font-size:13.5px;padding:0 8px}
+.count{font-size:12.5px;color:var(--ink2);margin:4px 2px 8px}
+
+/* album */
+.meter{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:16px;display:grid;gap:14px}
+@media (min-width:760px){.meter{grid-template-columns:240px 1fr}}
+.big{display:flex;align-items:baseline;gap:6px}
+.big strong{font:800 44px/1 var(--f-disp);font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:4px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .4s}
+.areas{display:grid;gap:9px}
+.arow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;font-size:13px;align-items:center;cursor:pointer;border:0;background:none;text-align:left;padding:0}
+.arow .bar{grid-column:1/-1}
+.arow em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.done{color:var(--accent);font-weight:700;font-size:11.5px;border:1.5px solid currentColor;border-radius:4px;padding:0 5px;margin-left:6px;letter-spacing:.1em}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:14px}
+.tile{border:0;padding:0;background:var(--paper);border-radius:12px;overflow:hidden;cursor:pointer;text-align:left;border:1px solid var(--rule)}
+.tile img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.tile div{padding:7px 9px 9px}
+.tile b{display:block;font-size:13px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.tile span{font-size:11px;color:var(--ink2)}
+.empty{text-align:center;padding:36px 16px;color:var(--ink2);border:1.5px dashed var(--rule);border-radius:14px;margin-top:14px}
+.empty svg{width:40px;height:40px;fill:none;stroke:var(--ink3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 16px;border-radius:11px;border:1px solid var(--rule);background:var(--paper);cursor:pointer;font-size:14px;text-decoration:none;color:var(--ink)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn[disabled]{opacity:.45;cursor:default}
+
+/* tab bar */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--paper);border-top:1px solid var(--rule);padding-bottom:var(--safe-b)}
+.tabs .wrap{display:flex;height:var(--tabh);max-width:560px}
+.tab{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11.5px;color:var(--ink3);cursor:pointer}
+.tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab[aria-selected="true"]{color:var(--accent);font-weight:700}
+
+/* sheet */
+.scrim{position:fixed;inset:0;z-index:40;background:rgb(0 0 0 / .38);opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;z-index:41;left:0;right:0;bottom:0;margin:0 auto;max-width:620px;max-height:92dvh;overflow:auto;background:var(--paper);border-radius:18px 18px 0 0;transform:translateY(105%);transition:transform .25s ease;padding:0 0 calc(18px + var(--safe-b));box-shadow:0 -8px 30px rgb(0 0 0 / .18);overscroll-behavior:contain}
+.sheet.on{transform:none}
+@media (min-width:900px){.sheet{bottom:auto;top:50%;border-radius:18px;transform:translateY(-46%) scale(.98);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}.sheet.on{transform:translateY(-50%);opacity:1;pointer-events:auto}}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--rule);margin:8px auto 4px}
+.x{position:absolute;right:10px;top:10px;width:38px;height:38px;border-radius:50%;border:0;background:color-mix(in srgb,var(--ink) 8%,transparent);cursor:pointer;display:grid;place-items:center;z-index:2}
+.x svg{width:18px;height:18px;stroke:var(--ink);stroke-width:2.2;fill:none;stroke-linecap:round}
+.photo{margin:6px 16px 0;border-radius:14px;overflow:hidden;position:relative;aspect-ratio:4/3;background:var(--bg)}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo .date{position:absolute;left:10px;bottom:10px;background:rgb(0 0 0 / .55);color:#fff;font-size:12px;padding:2px 8px;border-radius:5px}
+.drop{position:absolute;inset:0;border:2px dashed var(--rule);border-radius:14px;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:var(--ink2);width:100%}
+.drop svg{width:42px;height:42px;fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.drop b{color:var(--ink);font-size:15px}
+.drop.busy{pointer-events:none;opacity:.6}
+.phact{display:flex;gap:8px;padding:10px 16px 0}
+.phact .btn{flex:1;min-height:40px;font-size:13px}
+.body{padding:12px 18px 0}
+.body h3{font:800 21px/1.35 var(--f-disp);margin:0 0 6px;letter-spacing:.03em}
+.body h3 .n{display:inline-grid;place-items:center;min-width:26px;height:26px;border-radius:13px;background:var(--ink);color:var(--bg);font:700 13px var(--f-body);margin-right:8px;vertical-align:3px;padding:0 6px}
+.badge{display:inline-block;font:500 11px var(--f-body);border:1px solid currentColor;padding:0 6px;border-radius:3px;margin-left:6px;vertical-align:4px;color:var(--c-tower)}
+dl.meta{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:8px 0 10px;font-size:13px}
+dl.meta dt{color:var(--ink3)}dl.meta dd{margin:0}
+.note{margin:0 0 12px;font-size:14px;line-height:1.8}
+.memo label{display:block;font-size:12px;color:var(--ink2);margin-bottom:4px}
+.memo textarea{width:100%;min-height:68px;border:1px solid var(--rule);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px;padding:8px 10px;resize:vertical}
+.memo small{display:block;height:16px;font-size:11px;color:var(--ink3)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;padding:6px 18px 0}
+.acts .btn{flex:1 1 140px}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--tabh) + var(--safe-b) + 14px);transform:translate(-50%,20px);z-index:60;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.store{font-size:11.5px;color:var(--ink3);margin-top:16px;line-height:1.7}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brand">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 2L18.6 11.4 28 15 18.6 18.6 15 28 11.4 18.6 2 15 11.4 11.4Z" fill="var(--accent)"/></svg>
+    <div><b>東京 土木散歩</b><small>撮った写真で完成させる建築マップ</small></div>
+  </div>
+  <div class="prog" aria-live="polite">
+    <svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle class="bgc" cx="17" cy="17" r="14"/><circle class="fgc" id="ring" cx="17" cy="17" r="14" stroke-dasharray="87.96" stroke-dashoffset="87.96"/></svg>
+    <span><strong id="pn">0</strong> / <span id="pt">0</span></span>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <!-- 地図 -->
+  <section class="view" id="v-map" aria-label="地図">
+    <div class="chips" id="mapchips" role="toolbar" aria-label="地図の切り替え"></div>
+    <div class="maplay">
+      <div class="mapbox" id="mapbox">
+        <div class="band" id="band"></div>
+        <div class="ctrls">
+          <button class="ctrl" id="zin" aria-label="拡大"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="ctrl" id="zout" aria-label="縮小"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+          <button class="ctrl" id="zfit" aria-label="全体を表示"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+          <button class="ctrl" id="locate" aria-label="現在地"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+        </div>
+        <div class="credit">© OpenStreetMap contributors</div>
+      </div>
+      <div class="panel side">
+        <div class="panel-h" id="sideh"></div>
+        <ul class="rows" id="siderows"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 名所 -->
+  <section class="view" id="v-list" aria-label="名所一覧">
+    <h2>名所 <span id="ltot"></span></h2>
+    <div class="tools">
+      <input class="search" id="q" type="search" placeholder="名前・設計者・地域で探す" aria-label="名所を探す">
+      <div class="seg" id="fseg" role="group" aria-label="写真の有無">
+        <button data-f="all" aria-pressed="true">すべて</button><button data-f="todo" aria-pressed="false">未撮影</button><button data-f="got" aria-pressed="false">撮影済み</button>
+      </div>
+      <select class="sort" id="sort" aria-label="並び順">
+        <option value="north">北から順</option><option value="year">年代順</option><option value="near">近い順</option>
+      </select>
+    </div>
+    <div class="chips" id="catchips" role="group" aria-label="分類"></div>
+    <div class="count" id="lcount"></div>
+    <div class="panel"><ul class="rows" id="lrows"></ul></div>
+  </section>
+
+  <!-- アルバム -->
+  <section class="view" id="v-album" aria-label="アルバム">
+    <h2>アルバム</h2>
+    <div class="meter">
+      <div>
+        <div class="muted small">集めた写真</div>
+        <div class="big"><strong id="abig">0</strong><span class="muted">/ <span id="atot">0</span> か所</span></div>
+        <div class="bar" style="margin-top:8px"><i id="abar" style="width:0"></i></div>
+        <p class="small muted" id="amsg" style="margin:10px 0 0"></p>
+      </div>
+      <div class="areas" id="aareas"></div>
+    </div>
+    <div id="agrid"></div>
+    <p class="store" id="storeinfo"></p>
+  </section>
+</main>
+
+<nav class="tabs" aria-label="画面の切り替え"><div class="wrap" role="tablist">
+  <button class="tab" role="tab" data-v="map" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>地図</button>
+  <button class="tab" role="tab" data-v="list" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 6.4L21 12l-6.4 2.6L12 21l-2.6-6.4L3 12l6.4-2.6z"/></svg>名所</button>
+  <button class="tab" role="tab" data-v="album" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>アルバム</button>
+</div></nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title" hidden></div>
+<input type="file" id="file" accept="image/*" class="sr" tabindex="-1" aria-hidden="true">
+<div class="toast" id="toast" role="status"></div>
+
+<script src="tokyo-data.js" charset="utf-8"></script>
+<script src="tokyo-maps.js" charset="utf-8"></script>
+<script src="tokyo-mapdraw.js" charset="utf-8"></script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const TM=window.TokyoMap, KEYS=["overview"].concat(TM.AREA_KEYS);
+const byId={};D.forEach(d=>byId[d.id]=d);
+const SPOTS={};TM.AREA_KEYS.forEach(k=>{SPOTS[k]=TM.spots(k)});
+const noOf={},areaOf={};TM.AREA_KEYS.forEach(k=>SPOTS[k].forEach(s=>{noOf[s.d.id]=s.no;areaOf[s.d.id]=k}));
+const ICON_CAM='<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>';
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let toastT;function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),2600)}
+const fmtDate=iso=>{if(!iso)return"";const d=new Date(iso);return d.getFullYear()+"."+String(d.getMonth()+1).padStart(2,"0")+"."+String(d.getDate()).padStart(2,"0")};
+
+/* ============ 写真の保存 ============
+   claude.ai 上で開いているとき: 写真は artifact の assets、記録は db の自分専用領域（data/users/<id>）
+   使えないとき: この端末の IndexedDB */
+const P={local:{},cloud:{},mode:"local"};   // id -> {url, at, memo, asset?}
+function photo(id){const c=P.cloud[id],l=P.local[id];if(c&&c.url)return c;if(l&&l.url)return c?Object.assign({},l,{memo:c.memo||l.memo}):l;return c||l||null}
+function hasPhoto(id){const p=photo(id);return !!(p&&p.url)}
+let idb=null;
+function idbOpen(){return new Promise(res=>{try{const r=indexedDB.open("tokyo-sanpo",1);r.onupgradeneeded=()=>r.result.createObjectStore("photos");r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}})}
+function idbAll(){return new Promise(res=>{if(!idb)return res({});try{const out={},tx=idb.transaction("photos"),st=tx.objectStore("photos"),rq=st.openCursor();rq.onsuccess=()=>{const c=rq.result;if(c){out[c.key]=c.value;c.continue()}else res(out)};rq.onerror=()=>res(out)}catch(e){res({})}})}
+function idbPut(k,v){return new Promise((res,rej)=>{if(!idb)return rej(new Error("no idb"));try{const tx=idb.transaction("photos","readwrite");tx.objectStore("photos").put(v,k);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)}catch(e){rej(e)}})}
+function idbDel(k){return new Promise(res=>{if(!idb)return res();try{const tx=idb.transaction("photos","readwrite");tx.objectStore("photos").delete(k);tx.oncomplete=()=>res();tx.onerror=()=>res()}catch(e){res()}})}
+async function loadLocal(){
+  const all=await idbAll();
+  Object.values(P.local).forEach(p=>p.url&&p.url.startsWith("blob:")&&URL.revokeObjectURL(p.url));
+  P.local={};
+  for(const k in all){const v=all[k];P.local[k]={url:v.blob?URL.createObjectURL(v.blob):null,at:v.at,memo:v.memo||""}}
+}
+let cloud=null;
+async function initCloud(){
+  let c=window.claude;
+  for(let i=0;!c&&i<20;i++){await new Promise(r=>setTimeout(r,150));c=window.claude}
+  if(!c||typeof c.use!=="function")return;
+  try{
+    const [db,user,assets]=await Promise.all([c.use("db"),c.use("user"),c.use("assets")]);
+    if(!db||!user)return;
+    const uid=await user.id(); if(!uid)return;
+    cloud={db,assets,col:db.collection("data/users/"+uid)};
+    cloud.col.onSnapshot(snap=>{
+      const next={};
+      snap.docs.forEach(doc=>{const v=doc.data()||{};if(!byId[doc.id])return;next[doc.id]={asset:v.asset||null,url:v.asset?"/_blob/"+v.asset:null,at:v.at||null,memo:v.memo||""}});
+      P.cloud=next;P.mode=assets?"cloud":"cloud-memo";renderAll();
+    },err=>{cloud=null;P.mode="local";renderAll()});
+  }catch(e){cloud=null}
+}
+async function shrink(file){
+  let src,w,h,revoke=null;
+  try{src=await createImageBitmap(file,{imageOrientation:"from-image"});w=src.width;h=src.height}
+  catch(e){src=await new Promise((res,rej)=>{const im=new Image(),u=URL.createObjectURL(file);revoke=u;im.onload=()=>res(im);im.onerror=rej;im.src=u});w=src.naturalWidth;h=src.naturalHeight}
+  const s=Math.min(1,1600/Math.max(w,h)),cv=document.createElement("canvas");
+  cv.width=Math.round(w*s);cv.height=Math.round(h*s);
+  cv.getContext("2d").drawImage(src,0,0,cv.width,cv.height);
+  if(revoke)URL.revokeObjectURL(revoke);
+  return await new Promise(res=>cv.toBlob(res,"image/jpeg",.85));
+}
+async function savePhoto(id,file){
+  const blob=await shrink(file); if(!blob)throw new Error("画像を読み込めませんでした");
+  const at=new Date().toISOString(), memo=(photo(id)||{}).memo||"";
+  if(cloud&&cloud.assets){
+    try{
+      const old=P.cloud[id]&&P.cloud[id].asset;
+      const up=await cloud.assets.upload(blob,{type:"image/jpeg"});
+      await cloud.col.doc(id).set({asset:up.id,at,memo});
+      P.cloud[id]={asset:up.id,url:up.url,at,memo};
+      if(P.local[id]){await idbDel(id);delete P.local[id]}
+      if(old&&old!==up.id)cloud.assets.delete(old).catch(()=>{});
+      return "cloud";
+    }catch(e){
+      if(e&&e.code==="quota_or_state"){toast("保存領域がいっぱいです。この端末に保存します")}
+    }
+  }
+  await idbPut(id,{blob,at,memo});
+  if(P.local[id]&&P.local[id].url)URL.revokeObjectURL(P.local[id].url);
+  P.local[id]={url:URL.createObjectURL(blob),at,memo};
+  return "local";
+}
+async function removePhoto(id){
+  if(P.cloud[id]&&cloud){
+    const a=P.cloud[id].asset,memo=P.cloud[id].memo;
+    if(memo)await cloud.col.doc(id).set({asset:null,at:null,memo});else await cloud.col.doc(id).delete();
+    if(a&&cloud.assets)cloud.assets.delete(a).catch(()=>{});
+    if(memo)P.cloud[id]={asset:null,url:null,at:null,memo};else delete P.cloud[id];
+  }
+  if(P.local[id]){
+    const memo=P.local[id].memo;
+    if(P.local[id].url)URL.revokeObjectURL(P.local[id].url);
+    if(memo){await idbPut(id,{blob:null,at:null,memo});P.local[id]={url:null,at:null,memo}}
+    else{await idbDel(id);delete P.local[id]}
+  }
+}
+async function saveMemo(id,memo){
+  const cur=photo(id);
+  if((cur?cur.memo||"":"")===memo)return;
+  if(cloud&&(P.cloud[id]||!P.local[id])){
+    const c=P.cloud[id]||{asset:null,at:null};
+    if(!c.asset&&!memo){await cloud.col.doc(id).delete();delete P.cloud[id];return}
+    await cloud.col.doc(id).set({asset:c.asset||null,at:c.at||null,memo});
+    P.cloud[id]=Object.assign({},c,{memo,url:c.asset?"/_blob/"+c.asset:null});return;
+  }
+  const all=await idbAll(),v=all[id]||{blob:null,at:null};
+  if(!v.blob&&!memo){await idbDel(id);delete P.local[id];return}
+  v.memo=memo;await idbPut(id,v);
+  P.local[id]=Object.assign({},P.local[id]||{url:null,at:null},{memo});
+}
+
+/* ============ 現在地 ============ */
+let here=null;
+function locate(){
+  return new Promise(res=>{
+    if(!navigator.geolocation){toast("この画面では現在地を使えません");return res(null)}
+    navigator.geolocation.getCurrentPosition(p=>{here=[p.coords.latitude,p.coords.longitude];res(here)},
+      e=>{toast(e.code===1?"現在地の利用が許可されていません":"現在地を取得できませんでした");res(null)},
+      {enableHighAccuracy:true,timeout:12000,maximumAge:30000});
+  });
+}
+function distM(a,b){const R=6371e3,r=Math.PI/180,dl=(b[0]-a[0])*r,dn=(b[1]-a[1])*r,x=Math.sin(dl/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+const fmtDist=m=>m<1000?Math.round(m/10)*10+" m":(m/1000).toFixed(m<10000?1:0)+" km";
+
+/* ============ 地図 ============ */
+const box=$("#mapbox");
+let mapKey=ls.get("sanpo-map");if(KEYS.indexOf(mapKey)<0)mapKey="overview";
+let M=null,proj=null,svg=null,marks=[],vb=null,selId=null;
+function boxSize(){const r=box.getBoundingClientRect();return[Math.max(r.width,1),Math.max(r.height,1)]}
+function fit(mode){
+  const [cw,ch]=boxSize(),a=cw/ch;
+  let w,h;
+  if(mode==="contain"){if(M.w/M.h>a){w=M.w;h=w/a}else{h=M.h;w=h*a}}
+  else{if(M.w/M.h>a){h=M.h;w=h*a}else{w=M.w;h=w/a}}
+  vb={x:(M.w-w)/2,y:(M.h-h)/2,w,h};
+}
+function clampVB(){
+  const [cw,ch]=boxSize(),a=cw/ch;
+  const maxW=Math.max(M.w,M.h*a)*1.05,minW=M.w/9;
+  const cx=vb.x+vb.w/2,cy=vb.y+vb.h/2;
+  vb.w=Math.min(maxW,Math.max(minW,vb.w));vb.h=vb.w/a;
+  const nx=Math.min(M.w,Math.max(0,cx)),ny=Math.min(M.h,Math.max(0,cy));
+  vb.x=nx-vb.w/2;vb.y=ny-vb.h/2;
+}
+let raf=0;
+function apply(){
+  if(raf)return;
+  raf=requestAnimationFrame(()=>{raf=0;if(!svg)return;clampVB();
+    svg.setAttribute("viewBox",vb.x.toFixed(2)+" "+vb.y.toFixed(2)+" "+vb.w.toFixed(2)+" "+vb.h.toFixed(2));
+    const k=vb.w/boxSize()[0];
+    for(const m of marks)m.el.setAttribute("transform","translate("+m.x.toFixed(1)+","+m.y.toFixed(1)+") scale("+k.toFixed(4)+")");
+  });
+}
+function zoomAt(px,py,f){
+  const [cw]=boxSize(),k=vb.w/cw,ux=vb.x+px*k,uy=vb.y+py*k;
+  vb.w*=f;vb.h*=f;const k2=vb.w/cw;vb.x=ux-px*k2;vb.y=uy-py*k2;apply();
+}
+function centerOn(ll,zoomW){
+  const p=proj(ll[0],ll[1]),[cw,ch]=boxSize();
+  if(zoomW){vb.w=zoomW;vb.h=zoomW*ch/cw}
+  vb.x=p[0]-vb.w/2;vb.y=p[1]-vb.h/2;apply();
+}
+const S=n=>n.toFixed(1);
+function starPath(r){return TM.star(0,0,r)}
+function markerHTML(d,no){
+  const ph=photo(d.id),sel=selId===d.id,cid="cp-"+d.id;
+  let inner;
+  if(ph&&ph.url){
+    const r=sel?22:18;
+    inner='<clipPath id="'+cid+'"><circle r="'+r+'"/></clipPath><image href="'+esc(ph.url)+'" x="'+(-r)+'" y="'+(-r)+'" width="'+2*r+'" height="'+2*r+'" preserveAspectRatio="xMidYMid slice" clip-path="url(#'+cid+')"/><circle class="ph" r="'+r+'" fill="none"/>';
+  }else inner='<path class="star" d="'+starPath(sel?20:15)+'"/>';
+  if(no)inner+='<circle class="noc" cx="16" cy="-16" r="10"/><text class="not" x="16" y="-12">'+no+'</text>';
+  return inner+'<title>'+esc(d.name)+'</title>';
+}
+function dotHTML(d){
+  const ph=photo(d.id),col="var("+CATS[d.cat].v+")",sel=selId===d.id;
+  if(ph&&ph.url){const r=sel?14:11,cid="cp-"+d.id;
+    return '<clipPath id="'+cid+'"><circle r="'+r+'"/></clipPath><image href="'+esc(ph.url)+'" x="'+(-r)+'" y="'+(-r)+'" width="'+2*r+'" height="'+2*r+'" preserveAspectRatio="xMidYMid slice" clip-path="url(#'+cid+')"/><circle r="'+r+'" fill="none" style="stroke:'+col+';stroke-width:3"/><title>'+esc(d.name)+'</title>'}
+  return '<circle class="dot" r="'+(sel?9:6.5)+'" style="fill:'+col+(sel?";stroke:var(--ink);stroke-width:2.5":"")+'"/><title>'+esc(d.name)+'</title>';
+}
+function drawMarks(){
+  if(!svg)return;
+  let g=svg.querySelector("#marks");if(g)g.remove();
+  g=document.createElementNS("http://www.w3.org/2000/svg","g");g.id="marks";
+  const h=[];marks=[];
+  (M.labels||[]).forEach(l=>{const p=proj(l[1],l[2]);h.push('<g class="lblg" data-x="'+p[0]+'" data-y="'+p[1]+'"><text class="lbl">'+esc(l[0])+'</text></g>')});
+  if(mapKey==="overview"){
+    TM.AREA_KEYS.forEach(k=>{const a=TOKYO_MAPS[k],p1=proj(a.bbox[2],a.bbox[1]),p2=proj(a.bbox[0],a.bbox[3]);
+      h.push('<g class="area" data-area="'+k+'" tabindex="0" role="button" aria-label="'+esc(a.title)+'の地図を開く"><rect x="'+S(p1[0])+'" y="'+S(p1[1])+'" width="'+S(p2[0]-p1[0])+'" height="'+S(p2[1]-p1[1])+'" vector-effect="non-scaling-stroke" stroke-width="2"/><g class="albl" data-x="'+p1[0]+'" data-y="'+p1[1]+'"><text x="3" y="-5">'+esc(a.title.replace(/（.*）/,""))+'</text></g></g>')});
+    D.forEach(d=>{if(!TM.inside(M,d.ll))return;const p=proj(d.ll[0],d.ll[1]);
+      h.push('<g class="mk'+(selId===d.id?" sel":"")+'" data-id="'+d.id+'" data-x="'+p[0]+'" data-y="'+p[1]+'" tabindex="0" role="button" aria-label="'+esc(d.name)+'">'+dotHTML(d)+'</g>')});
+  }else{
+    SPOTS[mapKey].slice().reverse().forEach(s=>{const p=proj(s.d.ll[0],s.d.ll[1]);
+      h.push('<g class="mk'+(selId===s.d.id?" sel":"")+'" data-id="'+s.d.id+'" data-x="'+p[0]+'" data-y="'+p[1]+'" tabindex="0" role="button" aria-label="'+s.no+' '+esc(s.d.name)+'">'+markerHTML(s.d,s.no)+'</g>')});
+  }
+  if(here&&TM.inside(M,here)){const p=proj(here[0],here[1]);h.push('<g class="me" data-x="'+p[0]+'" data-y="'+p[1]+'"><circle class="halo" r="22"/><circle class="pt" r="8"/></g>')}
+  g.innerHTML=h.join("");svg.appendChild(g);
+  g.querySelectorAll("[data-x]").forEach(el=>marks.push({el,x:+el.dataset.x,y:+el.dataset.y}));
+  // 選択中を最前面に
+  const s=g.querySelector(".mk.sel");if(s)g.appendChild(s);
+  apply();
+}
+function showMap(key,keepView){
+  mapKey=key;ls.set("sanpo-map",key);M=TOKYO_MAPS[key];proj=TM.proj(M);
+  const oldSvg=box.querySelector("svg.tmap");if(oldSvg)oldSvg.remove();
+  box.insertAdjacentHTML("afterbegin",TM.svg(key,{bare:true}));
+  svg=box.querySelector("svg.tmap");svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+  svg.setAttribute("aria-label",M.title+"の地図。ドラッグで移動、ピンチやホイールで拡大");
+  if(!keepView)fit("cover");
+  drawMarks();renderChips();renderSide();
+  $("#band").innerHTML='<b>'+esc(M.title)+'</b><span>'+esc(M.en||"")+'</span>';
+}
+// ジェスチャー
+const ptrs=new Map();let moved=0,lastPinch=null;
+box.addEventListener("pointerdown",e=>{if(e.target.closest(".ctrls"))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(ptrs.size===1)moved=0;lastPinch=null});
+window.addEventListener("pointermove",e=>{
+  const p=ptrs.get(e.pointerId);if(!p||!vb)return;
+  const [cw]=boxSize(),k=vb.w/cw;
+  if(ptrs.size===1){const dx=e.clientX-p.x,dy=e.clientY-p.y;moved+=Math.abs(dx)+Math.abs(dy);vb.x-=dx*k;vb.y-=dy*k;p.x=e.clientX;p.y=e.clientY;apply();return}
+  p.x=e.clientX;p.y=e.clientY;
+  const [a,b]=[...ptrs.values()],r=box.getBoundingClientRect();
+  const mx=(a.x+b.x)/2-r.left,my=(a.y+b.y)/2-r.top,dist=Math.hypot(a.x-b.x,a.y-b.y);
+  if(lastPinch){moved+=99;vb.x-=(mx-lastPinch.mx)*k;vb.y-=(my-lastPinch.my)*k;zoomAt(mx,my,lastPinch.d/dist)}
+  lastPinch={mx,my,d:dist};
+});
+const up=e=>{ptrs.delete(e.pointerId);lastPinch=null};
+window.addEventListener("pointerup",up);window.addEventListener("pointercancel",up);
+box.addEventListener("wheel",e=>{e.preventDefault();const r=box.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,Math.exp(e.deltaY*(e.ctrlKey?.01:.0018)))},{passive:false});
+box.addEventListener("dblclick",e=>{if(e.target.closest(".ctrls,.mk,.area"))return;const r=box.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,.5)});
+box.addEventListener("click",e=>{
+  if(moved>8){moved=0;return}
+  const mk=e.target.closest(".mk");if(mk){openSpot(mk.dataset.id);return}
+  const ar=e.target.closest(".area");if(ar){showMap(ar.dataset.area)}
+});
+box.addEventListener("keydown",e=>{
+  if(e.key!=="Enter"&&e.key!==" ")return;const t=e.target;
+  if(t.classList&&t.classList.contains("mk")){e.preventDefault();openSpot(t.dataset.id)}
+  else if(t.classList&&t.classList.contains("area")){e.preventDefault();showMap(t.dataset.area)}
+});
+const ctr=()=>{const [cw,ch]=boxSize();return[cw/2,ch/2]};
+$("#zin").onclick=()=>{const c=ctr();zoomAt(c[0],c[1],.6)};
+$("#zout").onclick=()=>{const c=ctr();zoomAt(c[0],c[1],1/.6)};
+$("#zfit").onclick=()=>{fit("contain");apply()};
+$("#locate").onclick=async()=>{
+  const b=$("#locate");b.classList.add("busy");const ll=await locate();b.classList.remove("busy");
+  if(!ll)return;
+  let target=mapKey;
+  if(!TM.inside(M,ll)){target=TM.AREA_KEYS.find(k=>TM.inside(TOKYO_MAPS[k],ll))||(TM.inside(TOKYO_MAPS.overview,ll)?"overview":null)}
+  if(!target){toast("現在地は地図の範囲外です");drawMarks();renderList();return}
+  if(target!==mapKey)showMap(target);else drawMarks();
+  centerOn(ll,Math.min(vb.w,M.w/2.5));renderSide();renderList();
+};
+new ResizeObserver(()=>{if(vb){const [cw,ch]=boxSize(),cx=vb.x+vb.w/2,cy=vb.y+vb.h/2;vb.h=vb.w*ch/cw;vb.x=cx-vb.w/2;vb.y=cy-vb.h/2;apply()}}).observe(box);
+
+function renderChips(){
+  $("#mapchips").innerHTML=KEYS.map(k=>{
+    const m=TOKYO_MAPS[k];let cnt="";
+    if(k!=="overview"){const s=SPOTS[k],n=s.filter(x=>hasPhoto(x.d.id)).length;cnt='<span class="cnt">'+n+"/"+s.length+"</span>"}
+    return '<button class="chip" data-k="'+k+'" aria-pressed="'+(k===mapKey)+'">'+esc(k==="overview"?"全体図":m.title.replace(/（.*）/,""))+cnt+"</button>";
+  }).join("");
+}
+$("#mapchips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(b&&b.dataset.k!==mapKey)showMap(b.dataset.k)});
+
+function thumbHTML(d,no){
+  const ph=photo(d.id),n=no?'<span class="no">'+no+"</span>":"";
+  if(ph&&ph.url)return '<span class="thumb has"><img src="'+esc(ph.url)+'" alt="" loading="lazy">'+n+"</span>";
+  return '<span class="thumb">'+ICON_CAM+n+"</span>";
+}
+function rowHTML(d,no,extra){
+  const c=CATS[d.cat];
+  return '<li><button class="rowb'+(selId===d.id?" sel":"")+'" data-id="'+d.id+'">'+thumbHTML(d,no)+
+    '<span class="rt"><b>'+esc(d.name)+'</b><span><span class="tag"><i style="background:var('+c.v+')"></i>'+esc(c.l)+"</span> · "+esc(d.yl)+" · "+esc(d.area)+"</span></span>"+
+    (extra||"")+(hasPhoto(d.id)?'<span class="got">撮影済</span>':"")+"</button></li>";
+}
+function renderSide(){
+  if(mapKey==="overview"){
+    const tot=D.length,got=D.filter(d=>hasPhoto(d.id)).length;
+    $("#sideh").innerHTML='<b>エリアを選ぶ</b><p>破線の枠かエリア名を押すと詳しい地図に移ります。点は名所の位置（色は分類）、写真を入れた名所は写真で表示されます。全体で '+got+' / '+tot+' か所。</p>';
+    $("#siderows").innerHTML=TM.AREA_KEYS.map(k=>{const a=TOKYO_MAPS[k],s=SPOTS[k],n=s.filter(x=>hasPhoto(x.d.id)).length,first=s.find(x=>hasPhoto(x.d.id));
+      return '<li><button class="rowb" data-area="'+k+'">'+(first?thumbHTML(first.d):'<span class="thumb">'+ICON_CAM+"</span>")+'<span class="rt"><b>'+esc(a.title)+(n===s.length?'<span class="done">完成</span>':"")+'</b><span>'+n+" / "+s.length+" か所 撮影</span></span></button></li>"}).join("");
+    return;
+  }
+  const s=SPOTS[mapKey],n=s.filter(x=>hasPhoto(x.d.id)).length;
+  $("#sideh").innerHTML='<b>'+esc(M.title)+"</b>　<span class=\"muted small\">"+n+" / "+s.length+" か所</span>"+(n===s.length?'<span class="done">完成</span>':"")+"<p>"+esc(M.lede||"")+"</p>";
+  $("#siderows").innerHTML=s.map(x=>rowHTML(x.d,x.no,here?'<span class="dist">'+fmtDist(distM(here,x.d.ll))+"</span>":"")).join("");
+}
+$("#siderows").addEventListener("click",e=>{const b=e.target.closest(".rowb");if(!b)return;if(b.dataset.area)showMap(b.dataset.area);else openSpot(b.dataset.id)});
+
+/* ============ 名所一覧 ============ */
+let lf="all",lcats=new Set(),lq="";
+function renderCatChips(){
+  $("#catchips").innerHTML=Object.keys(CATS).map(k=>{const n=D.filter(d=>d.cat===k).length,g=D.filter(d=>d.cat===k&&hasPhoto(d.id)).length;
+    return '<button class="chip" data-c="'+k+'" aria-pressed="'+lcats.has(k)+'"><i style="background:var('+CATS[k].v+')"></i>'+esc(CATS[k].l)+'<span class="cnt">'+g+"/"+n+"</span></button>"}).join("");
+}
+$("#catchips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;const k=b.dataset.c;lcats.has(k)?lcats.delete(k):lcats.add(k);renderList()});
+$("#fseg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;lf=b.dataset.f;$("#fseg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderList()});
+$("#q").addEventListener("input",e=>{lq=e.target.value.trim().toLowerCase();renderList()});
+$("#sort").addEventListener("change",async e=>{if(e.target.value==="near"&&!here){const ll=await locate();if(!ll){e.target.value="north"}}renderList()});
+function renderList(){
+  renderCatChips();$("#ltot").textContent=D.length;
+  const sort=$("#sort").value;
+  let arr=D.filter(d=>(!lcats.size||lcats.has(d.cat))&&(lf==="all"||(lf==="got")===hasPhoto(d.id))&&
+    (!lq||(d.name+d.by+d.area+d.spec+d.yl).toLowerCase().indexOf(lq)>=0));
+  if(sort==="year")arr.sort((a,b)=>a.year-b.year);
+  else if(sort==="near"&&here)arr.sort((a,b)=>(a.ll?distM(here,a.ll):1e9)-(b.ll?distM(here,b.ll):1e9));
+  else arr.sort((a,b)=>(b.ll?b.ll[0]:0)-(a.ll?a.ll[0]:0));
+  $("#lcount").textContent=arr.length+" 件"+(sort==="near"&&here?"（現在地から近い順）":"");
+  $("#lrows").innerHTML=arr.length?arr.map(d=>rowHTML(d,null,here&&d.ll?'<span class="dist">'+fmtDist(distM(here,d.ll))+"</span>":"")).join(""):'<li class="empty" style="margin:0;border:0">条件に合う名所はありません</li>';
+}
+$("#lrows").addEventListener("click",e=>{const b=e.target.closest(".rowb");if(b)openSpot(b.dataset.id)});
+
+/* ============ アルバム ============ */
+function renderAlbum(){
+  const got=D.filter(d=>hasPhoto(d.id)),tot=D.length;
+  $("#abig").textContent=got.length;$("#atot").textContent=tot;$("#abar").style.width=(got.length/tot*100)+"%";
+  const done=TM.AREA_KEYS.filter(k=>SPOTS[k].every(x=>hasPhoto(x.d.id)));
+  $("#amsg").textContent=got.length===0?"名所で写真を撮ると、地図の星が写真に変わります。":
+    done.length?"完成した地図："+done.map(k=>TOKYO_MAPS[k].title).join("、"):"エリアの名所をすべて撮ると、その地図が完成します。";
+  const rows=TM.AREA_KEYS.map(k=>{const s=SPOTS[k],n=s.filter(x=>hasPhoto(x.d.id)).length;
+    return '<button class="arow" data-area="'+k+'"><span>'+esc(TOKYO_MAPS[k].title)+(n===s.length?'<span class="done">完成</span>':"")+"</span><em>"+n+" / "+s.length+'</em><span class="bar"><i style="width:'+(n/s.length*100)+'%"></i></span></button>'});
+  const other=D.filter(d=>!areaOf[d.id]),on=other.filter(d=>hasPhoto(d.id)).length;
+  rows.push('<div class="arow" style="cursor:default"><span>エリア外の名所</span><em>'+on+" / "+other.length+'</em><span class="bar"><i style="width:'+(on/other.length*100)+'%"></i></span></div>');
+  $("#aareas").innerHTML=rows.join("");
+  const list=got.slice().sort((a,b)=>String(photo(b.id).at||"").localeCompare(String(photo(a.id).at||"")));
+  $("#agrid").innerHTML=list.length?'<div class="grid">'+list.map(d=>'<button class="tile" data-id="'+d.id+'"><img src="'+esc(photo(d.id).url)+'" alt="'+esc(d.name)+'" loading="lazy"><div><b>'+esc(d.name)+"</b><span>"+fmtDate(photo(d.id).at)+"</span></div></button>").join("")+"</div>":
+    '<div class="empty">'+ICON_CAM.replace("<svg","<svg aria-hidden=\"true\"")+'<p style="margin:8px 0 14px">まだ写真がありません。<br>名所を訪ねて写真を入れると、ここに集まります。</p><button class="btn pri" data-go="map">地図をひらく</button></div>';
+  $("#storeinfo").textContent=P.mode==="cloud"?"写真はこのページの保存領域に、記録はあなた専用の領域に保存されます（ほかの閲覧者には見えません）。別の端末で開いても同じ写真が表示されます。":
+    "写真はこの端末のブラウザに保存されています。ブラウザのデータを消すと写真も消えます。";
+}
+$("#aareas").addEventListener("click",e=>{const b=e.target.closest(".arow[data-area]");if(b){showMap(b.dataset.area);go("map")}});
+$("#agrid").addEventListener("click",e=>{const t=e.target.closest(".tile");if(t)openSpot(t.dataset.id);const g=e.target.closest("[data-go]");if(g)go(g.dataset.go)});
+
+/* ============ 詳細シート ============ */
+const sheet=$("#sheet"),scrim=$("#scrim");let sheetId=null,lastFocus=null,busy=false;
+function sheetHTML(d){
+  const ph=photo(d.id),c=CATS[d.cat],no=noOf[d.id],ak=areaOf[d.id];
+  const inOverview=d.ll&&TM.inside(TOKYO_MAPS.overview,d.ll);
+  const photoBox=ph&&ph.url?
+    '<div class="photo"><img src="'+esc(ph.url)+'" alt="'+esc(d.name)+'の写真">'+(ph.at?'<span class="date">'+fmtDate(ph.at)+"</span>":"")+'</div><div class="phact"><button class="btn" data-act="pick">'+ICON_CAM+'写真を変える</button><button class="btn" data-act="del">写真を外す</button></div>':
+    '<div class="photo"><button class="drop'+(busy?" busy":"")+'" data-act="pick">'+ICON_CAM+"<b>"+(busy?"保存しています…":"写真を撮る・選ぶ")+'</b><span class="small">撮った写真を入れると地図の星が写真に変わります</span></button></div>';
+  return '<button class="x" data-act="close" aria-label="閉じる"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="grab"></div>'+photoBox+
+  '<div class="body"><h3 id="sh-title">'+(no?'<span class="n">'+no+"</span>":"")+esc(d.name)+(d.badge?'<span class="badge">'+esc(d.badge)+"</span>":"")+'</h3>'+
+  '<span class="tag"><i style="background:var('+c.v+')"></i>'+esc(c.l)+(ak?" · "+esc(TOKYO_MAPS[ak].title):"")+"</span>"+
+  '<dl class="meta"><dt>年</dt><dd>'+esc(d.yl)+"</dd><dt>場所</dt><dd>"+esc(d.area)+"</dd><dt>設計・施工</dt><dd>"+esc(d.by)+"</dd><dt>諸元</dt><dd>"+esc(d.spec)+"</dd>"+(here&&d.ll?"<dt>現在地から</dt><dd>"+fmtDist(distM(here,d.ll))+"</dd>":"")+"</dl>"+
+  '<p class="note">'+esc(d.note)+"</p>"+
+  '<div class="memo"><label for="memo">ひとことメモ</label><textarea id="memo" maxlength="400" placeholder="気づいたこと、撮った場所など">'+esc(ph&&ph.memo||"")+'</textarea><small id="memost"></small></div></div>'+
+  '<div class="acts">'+((ak||inOverview)?'<button class="btn" data-act="map"><svg viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/></svg>地図で見る</button>':"")+
+  (d.ll?'<a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+d.ll[0]+","+d.ll[1]+'"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>経路を調べる</a>':"")+"</div>";
+}
+function openSpot(id){
+  const d=byId[id];if(!d)return;
+  const changedSel=selId!==id;selId=id;sheetId=id;lastFocus=lastFocus||document.activeElement;
+  sheet.hidden=false;sheet.innerHTML=sheetHTML(d);
+  requestAnimationFrame(()=>{sheet.classList.add("on");scrim.classList.add("on")});
+  sheet.scrollTop=0;
+  if(changedSel){drawMarks();renderSide()}
+  setTimeout(()=>{const x=sheet.querySelector(".x");x&&x.focus({preventScroll:true})},60);
+}
+function refreshSheet(){if(sheetId&&!sheet.hidden){const st=sheet.scrollTop,memo=sheet.querySelector("#memo"),mv=memo&&memo.value,focused=document.activeElement===memo;sheet.innerHTML=sheetHTML(byId[sheetId]);const m2=sheet.querySelector("#memo");if(m2&&mv!=null&&focused){m2.value=mv;m2.focus()}sheet.scrollTop=st}}
+async function closeSheet(){
+  if(sheet.hidden)return;
+  await flushMemo();
+  sheet.classList.remove("on");scrim.classList.remove("on");sheetId=null;
+  setTimeout(()=>{if(!sheet.classList.contains("on"))sheet.hidden=true},260);
+  if(lastFocus&&lastFocus.focus)try{lastFocus.focus({preventScroll:true})}catch(e){}
+  lastFocus=null;
+}
+scrim.onclick=closeSheet;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!sheet.hidden)closeSheet()});
+let delArm=0;
+sheet.addEventListener("click",async e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act,id=sheetId;
+  if(a==="close")closeSheet();
+  else if(a==="pick"){if(busy)return;$("#file").value="";$("#file").click()}
+  else if(a==="map"){const d=byId[id],k=areaOf[id]||"overview";await closeSheet();go("map");if(k!==mapKey)showMap(k);centerOn(d.ll,Math.min(vb.w,M.w/2.2))}
+  else if(a==="del"){
+    if(Date.now()-delArm>3000){delArm=Date.now();b.textContent="もう一度押すと外します";b.style.color="var(--accent)";return}
+    delArm=0;try{await removePhoto(id);toast("写真を外しました")}catch(err){toast("写真を外せませんでした")}renderAll();
+  }
+});
+$("#file").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0],id=sheetId;if(!f||!id)return;
+  busy=true;refreshSheet();
+  try{const where=await savePhoto(id,f);toast(byId[id].name+" の写真を入れました")}
+  catch(err){toast("写真を保存できませんでした")}
+  busy=false;renderAll();
+});
+let memoT=null;
+async function flushMemo(){
+  const m=sheet.querySelector("#memo");if(!m||!sheetId)return;clearTimeout(memoT);memoT=null;
+  try{await saveMemo(sheetId,m.value.trim());const s=sheet.querySelector("#memost");s&&(s.textContent="保存しました")}catch(e){const s=sheet.querySelector("#memost");s&&(s.textContent="保存できませんでした")}
+}
+sheet.addEventListener("input",e=>{if(e.target.id!=="memo")return;const s=sheet.querySelector("#memost");s&&(s.textContent="");clearTimeout(memoT);memoT=setTimeout(flushMemo,1200)});
+sheet.addEventListener("focusout",e=>{if(e.target.id==="memo")flushMemo()});
+
+/* ============ 全体 ============ */
+function renderProgress(){
+  const n=D.filter(d=>hasPhoto(d.id)).length,t=D.length;
+  $("#pn").textContent=n;$("#pt").textContent=t;$("#ring").setAttribute("stroke-dashoffset",(87.96*(1-n/t)).toFixed(2));
+}
+function renderAll(){renderProgress();if(M){drawMarks();renderChips();renderSide()}renderList();renderAlbum();refreshSheet()}
+let view=ls.get("sanpo-view")||"map";
+function go(v){
+  view=v;ls.set("sanpo-view",v);
+  document.querySelectorAll(".view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.v===v));
+  if(v==="map"&&M&&!vb)fit("cover");
+  if(v==="map")apply();
+  window.scrollTo(0,0);
+}
+document.querySelector(".tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t)go(t.dataset.v)});
+
+go(["map","list","album"].indexOf(view)<0?"map":view);
+showMap(mapKey);
+renderAll();
+(async()=>{idb=await idbOpen();await loadLocal();renderAll();await initCloud()})();
+})();
+</script>
+</body>
+</html>
+
+</body></html>
