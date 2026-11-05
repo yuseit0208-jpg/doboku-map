@@ -14,6 +14,7 @@
   --frame:#3C6FA6; --deep:#1F3E6E; --pop:#D9412B;
   --sea:#CFE0EA; --land:#F3EFE3; --land-dim:#E9E5D9; --land-on:#FFFFFF; --edge:#C9C3B3;
   --t-arch:#C2412B; --t-stone:#6B4226; --t-suspension:#2F5E86; --t-cable:#2E9AC4; --t-truss:#4C6E2E;
+  --a0:#9CC3E0; --a1:#4E8EC4; --a2:#D9A23A; --a3:#C2412B; --a4:#5A2414;
   --t-girder:#5F6B72; --t-movable:#B5871A; --t-submersible:#1F8077; --t-wood:#A0663A; --t-aqueduct:#6E4C94;
   --f-title:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
   --f-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
@@ -95,6 +96,11 @@ button{font:inherit;color:inherit}
 .mk.sel circle{stroke:var(--ink);stroke-width:3}
 .mk:focus{outline:none}.mk:focus-visible circle{stroke:var(--pop);stroke-width:3}
 .mlabel{font-family:var(--f-body);font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--paper);stroke-linejoin:round;pointer-events:none}
+.agelg{position:absolute;left:8px;bottom:22px;background:var(--paper);border:1px solid var(--hair);padding:6px 8px;line-height:1.5;font-size:12px;display:grid;gap:2px}
+.agelg[hidden]{display:none}
+.agelg b{font-size:12px}
+.agelg span{display:flex;align-items:center;gap:6px}
+.agelg i{width:10px;height:10px;border-radius:50%;background:var(--c)}
 .zoomout{position:absolute;left:8px;top:8px;line-height:1.4;background:var(--paper)}
 .zoomout[hidden]{display:none}
 .credit{position:absolute;right:6px;bottom:4px;font:10px/1.4 var(--f-body);color:var(--muted)}
@@ -174,6 +180,9 @@ footer a{color:var(--frame)}
       <button type="button" class="chip" data-show="pick" aria-pressed="true">解説つきの名橋</button>
       <button type="button" class="chip" data-show="big" aria-pressed="false"><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="2.5" fill="var(--ink)"/></svg>＋大きい橋（500m以上）</button>
       <button type="button" class="chip" data-show="all" aria-pressed="false"><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="1.5" fill="var(--muted)"/></svg>＋ふつうの橋もすべて</button>
+      <span class="lab" style="margin-left:10px">色</span>
+      <button type="button" class="chip" data-color="form" aria-pressed="true">形式</button>
+      <button type="button" class="chip" data-color="age" aria-pressed="false">できてからの年数</button>
       <a class="lnk" href="list/" style="font-size:13px;color:var(--frame)">一覧で探す →</a>
     </div>
     <div class="tabs" id="tabs" role="toolbar" aria-label="地方を選ぶ"></div>
@@ -181,6 +190,7 @@ footer a{color:var(--frame)}
       <div class="mapview">
         <svg id="map" viewBox="5 -15 670 670" role="img" aria-label="日本地図と橋の位置"><g id="g-pref"></g><path id="g-all" class="dots"/><path id="g-big" class="dots big"/><g id="g-mk"></g><g id="g-lbl"></g></svg>
         <button type="button" class="chip zoomout" id="zoomout" hidden>← 全国にもどる</button>
+        <div class="agelg" id="agelg" hidden></div>
         <div class="credit">地図：国土地理院「地球地図日本」</div>
       </div>
       <aside class="panel" id="panel" aria-live="polite"></aside>
@@ -242,7 +252,7 @@ const col=f=>`var(--t-${f})`;
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* 状態 */
-const st={show:"pick",types:new Set,uses:new Set,eras:new Set,q:"",badge:false,region:null,sel:null,sort:"region",shown:60};
+const st={color:"form",show:"pick",types:new Set,uses:new Set,eras:new Set,q:"",badge:false,region:null,sel:null,sort:"region",shown:60};
 function match(d,skip){
   if(skip!=="types"&&st.types.size&&!d.forms.some(f=>st.types.has(f)))return false;
   if(skip!=="uses"&&st.uses.size&&!d.uses.some(u=>st.uses.has(u)))return false;
@@ -282,6 +292,15 @@ let vb=FULL.slice(),anim=0;
 function setVB(t){vb=t;svg.setAttribute("viewBox",t.map(n=>n.toFixed(2)).join(" "));drawMarks()}
 function animateTo(t){cancelAnimationFrame(anim);if(reduce){setVB(t);return}const f=vb.slice(),t0=performance.now();
   const step=now=>{const k=Math.min(1,(now-t0)/450),e=1-Math.pow(1-k,3);setVB(f.map((v,i)=>v+(t[i]-v)*e));if(k<1)anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
+// できてからの年数（今年－竣工年、架け替えは今の橋の年）
+const NOW=new Date().getFullYear();
+const AGES=[[0,29,"30年未満"],[30,49,"30〜49年"],[50,99,"50〜99年"],[100,199,"100〜199年"],[200,1e4,"200年以上"]];
+const ageOf=d=>d.year==null?null:NOW-d.year;
+const ageCol=d=>{const a=ageOf(d);if(a==null)return"var(--muted)";return`var(--a${AGES.findIndex(x=>a>=x[0]&&a<=x[1])})`};
+const mcol=d=>st.color==="age"?ageCol(d):col(d.form);
+function renderAgeLegend(){const el=$("#agelg");el.hidden=st.color!=="age";
+  el.innerHTML=`<b>できてから（${NOW}年時点）</b>`+AGES.map((a,i)=>`<span><i style="--c:var(--a${i})"></i>${a[2]}</span>`).join("")+`<span><i style="--c:var(--muted)"></i>不明</span>`;
+  document.querySelectorAll("[data-color]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.color===st.color))}
 function drawDots(){let a="",b="";if(st.show!=="pick")for(let i=0;i<PTS.length;i+=3){const s="M"+PTS[i]+" "+PTS[i+1]+"h0";if(PTS[i+2])b+=s;else if(st.show==="all")a+=s}
   $("#g-all").setAttribute("d",a);$("#g-big").setAttribute("d",b);document.querySelectorAll("[data-show]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.show===st.show))}
 function drawMarks(){
@@ -289,7 +308,7 @@ function drawMarks(){
   const r=(st.region?6.5:4.5)*u;
   const on=new Set(F().map(d=>d.id));
   const ds=D.filter(d=>on.has(d.id)).sort((a,b)=>(a.id===st.sel)-(b.id===st.sel));
-  $("#g-mk").innerHTML=ds.map(d=>`<g class="mk${d.id===st.sel?" sel":""}" data-id="${d.id}" tabindex="0" role="button" aria-label="${esc(d.name)}（${TL[d.form]}）" transform="translate(${d.x},${d.y})"><circle r="${(d.id===st.sel?r*1.5:r).toFixed(3)}" style="fill:${col(d.form)}"/><title>${esc(d.name)}</title></g>`).join("");
+  $("#g-mk").innerHTML=ds.map(d=>`<g class="mk${d.id===st.sel?" sel":""}" data-id="${d.id}" tabindex="0" role="button" aria-label="${esc(d.name)}（${TL[d.form]}）" transform="translate(${d.x},${d.y})"><circle r="${(d.id===st.sel?r*1.5:r).toFixed(3)}" style="fill:${mcol(d)}"/><title>${esc(d.name)}${d.year!=null?`（できてから${NOW-d.year}年）`:""}</title></g>`).join("");
   const s=st.sel&&on.has(st.sel)?byId[st.sel]:null;
   $("#g-lbl").innerHTML=s?`<text class="mlabel" x="${s.x+r*2.2}" y="${s.y+r*.5}" style="font-size:${(14*u).toFixed(3)}px;stroke-width:${(4*u).toFixed(3)}px">${esc(s.name)}</text>`:"";
   document.querySelectorAll(".pref").forEach(p=>p.classList.toggle("dim",!!st.region&&regionOfPref[p.dataset.pref]!==st.region))}
@@ -315,7 +334,7 @@ function renderPanel(){
   f.sort((a,b)=>a.pref-b.pref||((a.year??0)-(b.year??0)));
   $("#panel").innerHTML=(s?cardHTML(s,true):"")+
    `<h3 class="ptitle">${title}<small>${f.length}橋</small></h3>`+
-   (f.length?`<ul class="plist">${f.map(d=>`<li><button type="button" data-id="${d.id}" aria-current="${d.id===st.sel}" style="--c:${col(d.form)}"><i></i><span class="nm">${esc(d.name)}</span><span class="y">${PREF[d.pref].replace(/[都府県]$/,"")} ${d.year??""}</span></button></li>`).join("")}</ul>`:`<p class="empty">この条件の橋はありません。</p>`)}
+   (f.length?`<ul class="plist">${f.map(d=>`<li><button type="button" data-id="${d.id}" aria-current="${d.id===st.sel}" style="--c:${mcol(d)}"><i></i><span class="nm">${esc(d.name)}</span><span class="y">${PREF[d.pref].replace(/[都府県]$/,"")} ${st.color==="age"&&d.year!=null?(NOW-d.year)+"年":d.year??""}</span></button></li>`).join("")}</ul>`:`<p class="empty">この条件の橋はありません。</p>`)}
 
 /* 年代のグラフ（10年きざみ、1850年より前はまとめる） */
 function renderEra(){
@@ -349,7 +368,8 @@ function pick(id){st.sel=st.sel===id?null:id;const d=byId[id];if(st.sel&&st.regi
 const tog=(set,k)=>{set.has(k)?set.delete(k):set.add(k);st.shown=60;renderAll()};
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-show],[data-type],[data-uses],[data-eras],[data-region],[data-id],[data-jump],[data-sort],.pref");if(!t)return;
+  const t=e.target.closest("[data-color],[data-show],[data-type],[data-uses],[data-eras],[data-region],[data-id],[data-jump],[data-sort],.pref");if(!t)return;
+  if(t.dataset.color){st.color=t.dataset.color;renderAgeLegend();renderPanel();return drawMarks()}
   if(t.dataset.show){st.show=t.dataset.show;return drawDots()}
   if(t.dataset.type)return tog(st.types,t.dataset.type);
   if(t.dataset.uses)return tog(st.uses,t.dataset.uses);
@@ -367,7 +387,7 @@ $("#onlyBadge").addEventListener("click",()=>{st.badge=!st.badge;renderAll()});
 $("#reset").addEventListener("click",()=>{st.types.clear();st.uses.clear();st.eras.clear();st.q="";st.badge=false;$("#q").value="";renderAll()});
 $("#more").addEventListener("click",()=>{st.shown+=60;renderLedger()});
 addEventListener("resize",()=>drawMarks());
-drawDots();loadHash();$("#zoomout").hidden=!st.region;vb=st.region?regionBox(st.region):FULL;svg.setAttribute("viewBox",vb.join(" "));renderAll();
+drawDots();renderAgeLegend();loadHash();$("#zoomout").hidden=!st.region;vb=st.region?regionBox(st.region):FULL;svg.setAttribute("viewBox",vb.join(" "));renderAll();
 </script>
 </body>
 </html>
