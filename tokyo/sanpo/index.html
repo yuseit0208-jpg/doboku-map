@@ -10,9 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F4F0E5;--paper:#FFFDF7;--ink:#1F2326;--ink2:#5C6368;--ink3:#8A9094;--rule:#DCD5C4;--accent:#D8433F;--ok:#1F8077;--me:#2F6FD6;
-  --c-bridge:#2F5E86;--c-rail:#7A4E9A;--c-water:#1F8077;--c-port:#4C6E2E;--c-tower:#B5462E;--c-modern:#8A6A1F;--c-post:#3A3F44;
-  --m-land:#F2EEE2;--m-water:#C7DAE1;--m-park:#A8CBB2;--m-road:#D6D3CA;--m-road2:#C3BFB5;--m-rail:#7C8287;--m-star:#D8433F;--m-label:#6C7A73;--m-navy:#2C4E8C;
+  --bg:#FFF7EE;--paper:#FFFFFF;--ink:#2E2B36;--ink2:#6E6A78;--ink3:#A29EAB;--rule:#F1E5D6;--accent:#FF6B5B;--ok:#22A88E;--me:#3D7BF2;
+  --c-bridge:#4A86D9;--c-rail:#9B6BD6;--c-water:#22A88E;--c-port:#6BA34A;--c-tower:#F2784B;--c-modern:#D9A21E;--c-post:#5C6170;
+  --m-land:#F7F0E2;--m-water:#BFE3F4;--m-park:#CDEBC6;--m-road:#FFFFFF;--m-road2:#FFDDB0;--m-rail:#C2BBD3;--m-star:#FF6B5B;--m-label:#8C8798;--m-navy:#FF6B5B;
+  --shadow:0 6px 22px rgb(140 100 60 / .12);--pin:#FFFFFF;
   --f-disp:"Zen Maru Gothic","Hiragino Maru Gothic ProN","BIZ UDPGothic",sans-serif;
   --f-body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   --tabh:62px;--safe-b:env(safe-area-inset-bottom,0px);
@@ -21,12 +22,12 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#171C20;--paper:#1F262B;--ink:#E8E6E0;--ink2:#A9B0B4;--ink3:#7C858A;--rule:#343E45;--accent:#F06A5E;--ok:#5CC2B5;--me:#6FA3F5;
   --c-bridge:#7FB1DB;--c-rail:#B79AD6;--c-water:#5CC2B5;--c-port:#9BC173;--c-tower:#E58569;--c-modern:#D4B467;--c-post:#B9C0C5;
-  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#8DB3E6;
+  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#FF8A7D;--shadow:0 6px 22px rgb(0 0 0 / .35);--pin:#F4EFE8;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#171C20;--paper:#1F262B;--ink:#E8E6E0;--ink2:#A9B0B4;--ink3:#7C858A;--rule:#343E45;--accent:#F06A5E;--ok:#5CC2B5;--me:#6FA3F5;
   --c-bridge:#7FB1DB;--c-rail:#B79AD6;--c-water:#5CC2B5;--c-port:#9BC173;--c-tower:#E58569;--c-modern:#D4B467;--c-post:#B9C0C5;
-  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#8DB3E6;
+  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#FF8A7D;--shadow:0 6px 22px rgb(0 0 0 / .35);--pin:#F4EFE8;
   color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -200,6 +201,35 @@ dl.meta dt{color:var(--ink3)}dl.meta dd{margin:0}
 .store{font-size:11.5px;color:var(--ink3);margin-top:16px;line-height:1.7}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* 可愛い寄せ（写真地図アプリ風） */
+.mapbox{border:0;border-radius:24px;box-shadow:var(--shadow)}
+.panel,.meter{border:0;border-radius:22px;box-shadow:var(--shadow)}
+.chip{border:0;box-shadow:0 2px 8px rgb(140 100 60 / .10);padding:7px 15px}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mapbox .band b{border-radius:999px;padding:8px 16px;box-shadow:0 3px 10px rgb(255 107 91 / .35)}
+.mapbox .band span{color:var(--ink2)}
+.ctrl{border:0;border-radius:999px;box-shadow:0 3px 10px rgb(140 100 60 / .16)}
+.tile{border:0;border-radius:18px;box-shadow:var(--shadow)}
+.thumb{border-radius:14px}
+.btn{border-radius:999px}
+.search,select.sort,.seg{border-radius:999px}
+.tabs{border-top:0;box-shadow:0 -4px 18px rgb(140 100 60 / .10)}
+.sheet{border-radius:26px 26px 0 0}
+.photo{border-radius:20px}
+.tmap .m-road{stroke:var(--m-road)}
+.tmap .m-rail-dash{stroke:var(--m-land)}
+.mk .pinbg{fill:var(--pin)}
+.mk{filter:drop-shadow(0 2px 4px rgb(90 60 30 / .28))}
+.mk .shd{fill:rgb(60 40 20 / .18)}
+.mk .star{fill:var(--m-star);stroke:none}
+.mk.sel .star{stroke:none}
+.mk .ph{fill:none;stroke:none}
+.mk.sel .pinbg{fill:var(--accent)}
+.mk .noc{fill:var(--accent);stroke:var(--pin);stroke-width:2}
+.mk .not{fill:#fff}
+.mk .dot{stroke:var(--pin);stroke-width:2.5}
+.thumb .no,.body h3 .n{background:var(--accent);color:#fff}
+.thumb{border-color:#F3D9C9}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -449,12 +479,18 @@ const S=n=>n.toFixed(1);
 function starPath(r){return TM.star(0,0,r)}
 function markerHTML(d,no){
   const ph=photo(d.id),sel=selId===d.id,cid="cp-"+d.id;
-  let inner;
+  const pt='<ellipse class="shd" cx="0" cy="1" rx="9" ry="3.5"/><path class="pinbg" d="M-7,-9L0,0L7,-9Z"/>';
+  let inner,top;
   if(ph&&ph.url){
-    const r=sel?22:18;
-    inner='<clipPath id="'+cid+'"><circle r="'+r+'"/></clipPath><image href="'+esc(ph.url)+'" x="'+(-r)+'" y="'+(-r)+'" width="'+2*r+'" height="'+2*r+'" preserveAspectRatio="xMidYMid slice" clip-path="url(#'+cid+')"/><circle class="ph" r="'+r+'" fill="none"/>';
-  }else inner='<path class="star" d="'+starPath(sel?20:15)+'"/>';
-  if(no)inner+='<circle class="noc" cx="16" cy="-16" r="10"/><text class="not" x="16" y="-12">'+no+'</text>';
+    const w=sel?50:42,x=-w/2,y=-8-w,r=12;top=y;
+    inner=pt+'<rect class="pinbg" x="'+x+'" y="'+y+'" width="'+w+'" height="'+w+'" rx="'+(r+2)+'"/>'+
+      '<clipPath id="'+cid+'"><rect x="'+(x+3)+'" y="'+(y+3)+'" width="'+(w-6)+'" height="'+(w-6)+'" rx="'+r+'"/></clipPath>'+
+      '<image href="'+esc(ph.url)+'" x="'+(x+3)+'" y="'+(y+3)+'" width="'+(w-6)+'" height="'+(w-6)+'" preserveAspectRatio="xMidYMid slice" clip-path="url(#'+cid+')"/>';
+  }else{
+    const R=sel?19:16,cy=-8-R;top=cy-R;
+    inner=pt+'<circle class="pinbg" cx="0" cy="'+cy+'" r="'+R+'"/><path class="star" d="'+TM.star(0,cy,R*0.68)+'"/>';
+  }
+  if(no)inner+='<circle class="noc" cx="15" cy="'+(top+2)+'" r="10"/><text class="not" x="15" y="'+(top+6)+'">'+no+'</text>';
   return inner+'<title>'+esc(d.name)+'</title>';
 }
 function dotHTML(d){
