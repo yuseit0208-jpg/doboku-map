@@ -143,6 +143,8 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
 .lv li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:14px;line-height:1.7}
 .lv .badge{min-width:5.6em;text-align:center}
 .lv b{font-weight:700}
+.mast .src{font-size:13px;margin:6px 0 0}
+.mast .src a{color:#fff}
 .jump{all:unset;cursor:pointer;color:#fff;font-size:13px;border-bottom:1px solid currentColor;justify-self:start;margin-top:6px}
 .mean{font-size:13px;color:var(--muted);margin:2px 0 0;line-height:1.6}
 #q{flex:1 1 200px;min-width:0;border:1px solid var(--hair);background:var(--paper);padding:4px 8px;border-radius:2px;font-size:14px}
@@ -158,6 +160,7 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
     <h1>全国の橋 健全度マップ</h1>
     <p>日本の道路の橋は約73万。その全てが5年に1回「健康診断」を受けています。国のデータベースにあるその結果を全部、地図に落としました。色は診断の結果（健全度）か、橋ができてからの年数。自分の町を選ぶと、普段渡っている橋が今どんな状態かが分かります。</p>
     <div class="stats" id="stats"></div>
+    <p class="src">データ：国土交通省 <a href="https://road-structures-db.mlit.go.jp/" target="_blank" rel="noopener">xROAD 全国道路施設点検データベース</a> ・ <a href="https://road-structures-map.mlit.go.jp/" target="_blank" rel="noopener">xROAD の地図で見る</a></p>
     <button type="button" class="jump" data-to="words">初めての人は「用語の説明」から読んでください ↓</button>
   </header>
 
@@ -250,7 +253,7 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
   </section>
 
   <section class="sec foot">
-    <p>出典：国土交通省「全国道路施設点検データベース（xROAD）」の橋梁データ（API 取得 <span id="upd"></span>）。判定区分は道路橋の定期点検（5年に1回）の結果で、Ⅰ健全・Ⅱ予防保全段階・Ⅲ早期措置段階・Ⅳ緊急措置段階。「判定なし」はデータベースに判定が入っていない橋です。年数は架設年度から数えた目安で、架設年度が分からない橋は「不明」にしています。地図の点は管理者が登録した位置で、ずれていることがあります。</p>
+    <p>出典：国土交通省「<a href="https://road-structures-db.mlit.go.jp/" target="_blank" rel="noopener">全国道路施設点検データベース（xROAD）</a>」の橋梁データ（API 取得 <span id="upd"></span>）。判定区分は道路橋の定期点検（5年に1回）の結果で、Ⅰ健全・Ⅱ予防保全段階・Ⅲ早期措置段階・Ⅳ緊急措置段階。「判定なし」はデータベースに判定が入っていない橋です。年数は架設年度から数えた目安で、架設年度が分からない橋は「不明」にしています。地図の点は管理者が登録した位置で、ずれていることがあります。</p>
     <p>点検の結果は橋の管理者（国・都道府県・市区町村・高速道路会社など）が出したものです。このページは見て楽しむためのもので、通行してよいかどうかの判断には使えません。</p>
   </section>
 </div>
@@ -419,7 +422,7 @@ async function select(i,center){
     <dt>橋の長さ</dt><dd>${LN[i]?(LN[i]/10).toLocaleString("ja-JP")+" m":"—"}${wd?` ・ 幅 ${wd} m`:""}</dd>
     <dt>管理者</dt><dd>${esc(d.m[mi])}（${KL[KB[i]]||"その他"}）</dd>
    </dl>
-   <p style="margin:8px 0 0"><a class="ext" href="https://maps.gsi.go.jp/#17/${lat}/${lon}/" target="_blank" rel="noopener">地理院地図で見る</a> ・ <a class="ext" href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" rel="noopener">Googleマップ</a></p>`;
+   <p style="margin:8px 0 0"><a class="ext" href="https://maps.gsi.go.jp/#17/${lat}/${lon}/" target="_blank" rel="noopener">地理院地図で見る</a> ・ <a class="ext" href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" rel="noopener">Googleマップ</a><br><a class="ext" href="https://road-structures-map.mlit.go.jp/" target="_blank" rel="noopener">xROAD の地図で調べる</a> ・ <a class="ext" href="https://road-structures-db.mlit.go.jp/" target="_blank" rel="noopener">xROAD データベース</a></p>`;
   markList();
 }
 
