@@ -150,6 +150,8 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
 #q{flex:1 1 200px;min-width:0;border:1px solid var(--hair);background:var(--paper);padding:4px 8px;border-radius:2px;font-size:14px}
 #q:disabled,#city:disabled{opacity:.5}
 .lead{font-size:14px;max-width:72ch;margin:0 0 4px}
+.chk{margin:4px 0 0;padding-left:1.2em}
+.chk li{margin:1px 0}
 .word .who{font-size:12px;color:var(--muted)}
 .foot{font-size:12px;color:var(--muted);color:var(--muted);line-height:1.7}
 .foot a{color:var(--frame)}
@@ -164,6 +166,7 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
     <div class="stats" id="stats"></div>
     <p class="src">データ：国土交通省 <a href="https://road-structures-db.mlit.go.jp/" target="_blank" rel="noopener">xROAD 全国道路施設点検データベース</a> ・ <a href="https://road-structures-map.mlit.go.jp/" target="_blank" rel="noopener">xROAD の地図で見る</a></p>
     <button type="button" class="jump" data-to="words">初めての人は「用語の説明」から読んでください ↓</button>
+    <button type="button" class="jump" data-to="citizen">市民が日常的に橋を見守るには ↓</button>
   </header>
 
   <section class="sec">
@@ -250,7 +253,26 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
       <div class="word"><dt>橋の高齢化</dt><dd>年数の分かる橋のうち、今は44%が築50年以上です。20年後には8割を超えます（このマップのデータで計算）。高度経済成長期に一斉に造った橋が、これから一斉に年を取っていきます。</dd></div>
       <div class="word"><dt>誰が守っているか</dt><dd>全国の橋の約7割は市区町村が管理しています。小さな町では、橋に詳しい技術者がいなかったり、直すお金が足りなかったりして、点検や修理が大きな負担になっています。使う人が少ない橋は、直さずにまとめたり撤去したりすることもあります。</dd></div>
       <div class="word"><dt>橋がなくなると</dt><dd>橋は洪水で流されたり、古くなって通れなくなったりすることがあります。通れなくなると、遠回りが必要になるだけでなく、救急車や消防車が遅れたり、災害のときに避難や物資の運搬ができなくなったりします。新しく架けるには、計画・設計・土地の調整・工事が必要で、小さな橋でも数年、大きな橋では10年以上かかることもあります。</dd></div>
-      <div class="word"><dt>市民にできること</dt><dd>橋のひび割れ・さび・穴、手すりのぐらつきなどに気づいたら、市役所などの管理者に知らせましょう（国道などの異常は「道路緊急ダイヤル #9910」）。橋のたもとには「橋名板」というプレートがあり、橋の名前やできた年が書いてあります。身近な橋で探してみてください。</dd></div>
+      <div class="word"><dt>市民にできること</dt><dd>5年に1回の点検の間にも、橋は毎日使われ、傷んでいきます。その間を埋めるのが、橋を毎日渡っている市民の目です。具体的な見方は下の「市民が日常的に橋を見守る」にまとめました。</dd></div>
+    </dl>
+  </section>
+
+  <section class="sec" id="citizen">
+    <h2 class="h2">市民が日常的に橋を見守る<small>このマップが目指すこと</small></h2>
+    <p class="lead">法律で決まった定期点検は5年に1回、専門の技術者が行います。しかし市区町村には技術者もお金も足りず、5年の間に起きる変化には気づきにくいのが現状です。橋を毎日渡っている市民が、日常的に橋の様子を見て記録し、管理者に伝える。これが当たり前になれば、傷みを早く見つけて小さく直す「予防保全」が進みます。</p>
+    <dl class="words">
+      <div class="word"><dt>どこを見るか</dt><dd>
+        <ul class="chk">
+          <li>コンクリートのひび割れ、表面の剥がれ、中の鉄筋が見えていないか</li>
+          <li>鉄の部分のさび、塗装の剥がれ、穴</li>
+          <li>手すりや柵のぐらつき・曲がり・欠け</li>
+          <li>路面の段差、穴、継ぎ目（伸縮装置）のがたつきや異音</li>
+          <li>排水口の詰まり、雨の後の水たまり</li>
+          <li>橋の下側や橋台のまわりの、川の水による削れ・土砂の崩れ</li>
+        </ul></dd></div>
+      <div class="word"><dt>どう記録するか</dt><dd>気になる所を見つけたら、<b>写真</b>を撮り、<b>日付</b>と<b>場所</b>（橋の名前、どちら側か）を残します。橋の名前は「橋名板」か、このマップで橋の点を押すと分かります。同じ場所を時間をおいて撮り比べると、傷みが進んでいるかどうかが分かります。</dd></div>
+      <div class="word"><dt>どう伝えるか</dt><dd>記録は、その橋の<b>管理者</b>に伝えます（このマップで点を押すと管理者が出ます）。市区町村の道路の担当課のほか、国道などの異常は「道路緊急ダイヤル #9910」で受け付けています。ただし、穴が開いている・大きく傾いているなど危険な状態のときは、近づかずにすぐ連絡してください。</dd></div>
+      <div class="word"><dt>注意すること</dt><dd>橋の下や川の中、車道に入っての確認はしないでください。市民の見守りは、正式な定期点検（判定区分を付けること）の代わりではなく、それを補うものです。見つけたことをもとに、管理者が詳しく調べて判断します。</dd></div>
     </dl>
   </section>
 
