@@ -1,0 +1,491 @@
+<title>全国の橋 健全度マップ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@700;800&family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@500;700&display=swap">
+<style>
+/* 日本の橋マップと同じ見た目（青い枠・明朝の見出し）。地図は canvas に 73万点を直接描く。
+   判定区分の色は 点検の「健全→緊急」を 青→黄→赤→黒紫 の順で。年数は 水色→青→黄土→赤→こげ茶。 */
+:root{
+  --paper:#FDFCF8; --bg:#EEF0EE; --ink:#1C2630; --muted:#56606A; --hair:#D3CFC4;
+  --frame:#3C6FA6; --deep:#1F3E6E; --pop:#D9412B;
+  --sea:#CFE0EA; --land:#F6F3EA; --edge:#B9B3A3; --muni:#DDD8CB;
+  --h1:#3F86C6; --h2:#E0A526; --h3:#D9412B; --h4:#4A1240; --h0:#A3A9AD;
+  --a0:#8FC0E3; --a1:#3C6FA6; --a2:#D9A23A; --a3:#C2412B; --a4:#4B1E10; --ax:#A3A9AD;
+  --f-title:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#1B2228; --bg:#12171B; --ink:#E4E7E3; --muted:#9AA5AB; --hair:#33404A;
+  --frame:#6E9FD3; --deep:#A9C6E8; --pop:#F07A66;
+  --sea:#101E26; --land:#26303A; --edge:#4A5864; --muni:#313C46;
+  --h1:#5FA3DE; --h2:#F0BC45; --h3:#F2604A; --h4:#E59BE0; --h0:#6E777D;
+  --a0:#9FD0F0; --a1:#5E95D0; --a2:#E8B85A; --a3:#F06A50; --a4:#E8B9A6; --ax:#6E777D;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#1B2228; --bg:#12171B; --ink:#E4E7E3; --muted:#9AA5AB; --hair:#33404A;
+  --frame:#6E9FD3; --deep:#A9C6E8; --pop:#F07A66;
+  --sea:#101E26; --land:#26303A; --edge:#4A5864; --muni:#313C46;
+  --h1:#5FA3DE; --h2:#F0BC45; --h3:#F2604A; --h4:#E59BE0; --h0:#6E777D;
+  --a0:#9FD0F0; --a1:#5E95D0; --a2:#E8B85A; --a3:#F06A50; --a4:#E8B9A6; --ax:#6E777D;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 var(--f-body);
+  padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (max-width:560px){body{padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));padding-top:8px}}
+.page{max-width:1240px;margin:0 auto;background:var(--paper);border:6px solid var(--frame);padding:0 0 28px}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pop);outline-offset:2px}
+
+.mast{background:var(--frame);color:#fff;padding:20px 24px 16px;display:grid;gap:4px}
+.mast .en{font:italic 800 14px/1 var(--f-title);letter-spacing:.06em;opacity:.85}
+.mast h1{font:800 clamp(30px,6.5vw,52px)/1.1 var(--f-title);margin:0;letter-spacing:.04em;text-wrap:balance}
+.mast p{margin:4px 0 0;max-width:64ch;font-size:14px;opacity:.95}
+.stats{display:flex;flex-wrap:wrap;gap:4px 22px;font:500 13px var(--f-num);margin-top:8px}
+.stats b{font-size:20px;font-weight:700;margin-right:4px}
+.sec{padding:0 24px;margin-top:22px}
+@media (max-width:560px){.sec{padding:0 12px}.mast{padding:16px 12px 12px}}
+.h2{font:800 21px/1.3 var(--f-title);margin:0 0 6px;color:var(--deep);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.h2 small{font:400 13px var(--f-body);color:var(--muted)}
+
+/* 絞り込み */
+.filters{display:grid;gap:8px;border-top:2px solid var(--ink);padding-top:12px}
+.frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.frow .lab{font:700 12px var(--f-body);color:var(--muted);width:4.2em;flex:none;letter-spacing:.04em}
+.chip{border:1px solid var(--hair);background:transparent;padding:3px 10px;border-radius:2px;cursor:pointer;font-size:13px;display:inline-flex;gap:6px;align-items:center;line-height:1.6}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.chip .n{font:500 11px var(--f-num);color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip[aria-pressed="true"] .n{color:inherit;opacity:.7}
+.chip.off{opacity:.45}
+select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;border-radius:2px;font-size:14px;max-width:100%}
+.reset{all:unset;cursor:pointer;color:var(--frame);font-size:13px;border-bottom:1px solid currentColor}
+.count{font:500 13px var(--f-num);color:var(--muted);margin-left:auto}
+.count b{color:var(--ink);font-size:17px}
+@media (max-width:560px){.chip{font-size:12px;padding:2px 7px;gap:4px}.chip .n{font-size:10px}.frow{gap:4px}.frow .lab{width:100%}.preset{font-size:12px;padding:1px 7px}.mapwrap{height:min(70vh,560px)}}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.preset{all:unset;cursor:pointer;font-size:13px;border:1px dashed var(--frame);color:var(--frame);padding:2px 10px;border-radius:2px}
+.preset:hover{background:color-mix(in srgb,var(--frame) 10%,transparent)}
+.preset:focus-visible{outline:2px solid var(--pop)}
+
+/* 地図 */
+.mapgrid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:12px}
+@media (max-width:860px){.mapgrid{grid-template-columns:minmax(0,1fr)}}
+.mapwrap{position:relative;border:1.5px solid var(--frame);background:var(--sea);height:min(78vh,760px);min-height:380px;overflow:hidden;touch-action:none;cursor:grab}
+.mapwrap.drag{cursor:grabbing}
+.mapwrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ctrl{position:absolute;right:8px;top:8px;display:grid;gap:4px;z-index:2}
+.ctrl button{width:34px;height:34px;border:1px solid var(--hair);background:var(--paper);font:700 18px/1 var(--f-num);cursor:pointer;border-radius:2px}
+.ctrl button.txt{font:700 11px var(--f-body);width:auto;padding:0 6px}
+.colorby{position:absolute;left:8px;top:8px;z-index:2;display:flex;background:var(--paper);border:1px solid var(--hair)}
+.colorby button{border:0;background:transparent;padding:5px 10px;font-size:13px;cursor:pointer}
+.colorby button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.legend{position:absolute;left:8px;bottom:8px;z-index:2;background:color-mix(in srgb,var(--paper) 92%,transparent);border:1px solid var(--hair);padding:6px 9px;font-size:12px;line-height:1.5;display:grid;gap:1px;max-width:calc(100% - 16px)}
+.legend span{display:flex;gap:6px;align-items:center;white-space:nowrap}
+.legend i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.loading[hidden]{display:none}
+.loading{position:absolute;inset:0;display:grid;place-items:center;font:700 14px var(--f-body);color:var(--muted);z-index:3;pointer-events:none}
+.hint{position:absolute;right:8px;bottom:8px;z-index:2;font-size:11px;color:var(--muted);background:color-mix(in srgb,var(--paper) 85%,transparent);padding:1px 6px}
+@media (max-width:560px){.hint{display:none}}
+
+/* 右側 */
+.side{display:grid;gap:16px;min-width:0}
+.card{border:1.5px solid var(--ink);background:var(--paper);padding:12px 14px;min-width:0}
+.card h3{font:800 18px/1.3 var(--f-title);margin:0 0 6px;color:var(--deep)}
+.card .empty{color:var(--muted);font-size:13px;margin:0}
+.bname{font:800 22px/1.25 var(--f-title);margin:0}
+.bsub{font-size:13px;color:var(--muted);margin:2px 0 8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:14px;margin:0}
+.kv dt{color:var(--muted);font-size:12px;padding-top:2px}
+.kv dd{margin:0;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:0 8px;color:#fff;background:var(--c);font:700 13px/1.7 var(--f-body);border-radius:2px}
+.badge.lt{color:#1C2630}
+.ext{font-size:13px;color:var(--frame)}
+
+.matrix{width:100%;border-collapse:collapse;font:500 12px var(--f-num);font-variant-numeric:tabular-nums}
+.matrix th{font:700 11px var(--f-body);color:var(--muted);padding:3px 4px;text-align:right;white-space:nowrap}
+.matrix th:first-child{text-align:left}
+.matrix td{padding:0;text-align:right}
+.matrix td button{all:unset;box-sizing:border-box;display:block;width:100%;padding:4px 5px;cursor:pointer;background:color-mix(in srgb,var(--c) calc(var(--v)*100%),transparent)}
+.matrix td button:hover{outline:1.5px solid var(--ink);outline-offset:-1.5px}
+.matrix td button:focus-visible{outline:2px solid var(--pop);outline-offset:-2px}
+.matrix td button.on{outline:2px solid var(--ink);outline-offset:-2px}
+.matrix tr.tot td{border-top:1px solid var(--ink);padding:4px 5px;color:var(--muted)}
+.wrapx{overflow-x:auto}
+.note{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6}
+
+.hist svg{width:100%;height:auto;display:block}
+.hist text{fill:var(--muted);font:500 10px var(--f-num)}
+.hist line{stroke:var(--hair)}
+
+/* 都道府県の表・橋の一覧 */
+.twocol{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.twocol{grid-template-columns:minmax(0,1fr)}}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font:700 11px var(--f-body);color:var(--muted);text-align:left;border-bottom:1.5px solid var(--ink);padding:4px 6px;white-space:nowrap;cursor:pointer;user-select:none}
+.tbl th.num,.tbl td.num{text-align:right;font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.tbl td{border-bottom:1px solid var(--hair);padding:4px 6px;vertical-align:top}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover td{background:color-mix(in srgb,var(--frame) 8%,transparent)}
+.tbl tr.sel td{background:color-mix(in srgb,var(--pop) 12%,transparent)}
+.bar{display:inline-block;height:8px;background:var(--h3);vertical-align:middle;margin-left:6px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:0}
+.scroll{max-height:560px;overflow:auto;border-bottom:1px solid var(--hair)}
+.more{all:unset;cursor:pointer;color:var(--frame);font-size:13px;border-bottom:1px solid currentColor;margin-top:8px;display:inline-block}
+.foot{font-size:12px;color:var(--muted);line-height:1.7}
+.foot a{color:var(--frame)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="page">
+  <header class="mast">
+    <span class="en">Bridge Health Atlas of Japan</span>
+    <h1>全国の橋 健全度マップ</h1>
+    <p>国の「全国道路施設点検データベース」に載っている道路橋を全部、地図に落としました。色は点検の判定区分（Ⅰ健全〜Ⅳ緊急措置）か、かけられてからの年数。条件を選ぶと、たとえば「築50年以上で判定Ⅲ」の橋だけが残ります。</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <section class="sec">
+    <div class="filters">
+      <div class="frow"><span class="lab">よく見る</span><div class="presets" id="presets"></div></div>
+      <div class="frow" id="f-h"><span class="lab">判定区分</span></div>
+      <div class="frow" id="f-a"><span class="lab">年数</span></div>
+      <div class="frow" id="f-k"><span class="lab">管理者</span></div>
+      <div class="frow" id="f-l"><span class="lab">橋の長さ</span></div>
+      <div class="frow"><span class="lab">都道府県</span><select id="pref" aria-label="都道府県"></select>
+        <button class="reset" id="reset" type="button">条件をはずす</button>
+        <span class="count" id="count"></span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="mapgrid">
+      <div class="mapwrap" id="map">
+        <canvas id="cv-base"></canvas><canvas id="cv-pts"></canvas>
+        <div class="colorby" role="group" aria-label="色分け"><button type="button" data-c="h" aria-pressed="true">健全度で色分け</button><button type="button" data-c="a" aria-pressed="false">年数で色分け</button></div>
+        <div class="ctrl"><button type="button" id="zin" aria-label="拡大">＋</button><button type="button" id="zout" aria-label="縮小">−</button><button type="button" class="txt" id="zall">全国</button></div>
+        <div class="legend" id="legend"></div>
+        <div class="hint">ドラッグで移動・ホイールやピンチで拡大・点をタップで詳しく</div>
+        <div class="loading" id="loading">橋のデータを読みこみ中…</div>
+      </div>
+      <div class="side">
+        <div class="card" id="info"><h3>えらんだ橋</h3><p class="empty">地図の点をタップすると、橋の名前・かけた年・点検の結果が出ます。</p></div>
+        <div class="card"><h3>年数 × 判定区分</h3>
+          <div class="wrapx"><table class="matrix" id="matrix"></table></div>
+          <p class="note">いまの条件（判定区分と年数をのぞく）にあてはまる橋の数。マスを押すとその組み合わせだけを地図に出します。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2 class="h2">かけられた年と判定区分<small id="hist-sub"></small></h2>
+    <div class="hist" id="hist"></div>
+    <p class="note">高度経済成長期（1955〜1973年ごろ）にかけた橋が山になっていて、そこに判定Ⅲの赤が多く重なります。</p>
+  </section>
+
+  <section class="sec">
+    <div class="twocol">
+      <div>
+        <h2 class="h2">都道府県くらべ<small>行を押すとその県へ。割合は判定区分・年数の条件をはずして計算</small></h2>
+        <div class="scroll"><table class="tbl" id="ptable"></table></div>
+      </div>
+      <div>
+        <h2 class="h2">橋の一覧<small id="list-sub"></small></h2>
+        <div id="list"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec foot">
+    <p>出典：国土交通省「全国道路施設点検データベース（xROAD）」の橋梁データ（API 取得 <span id="upd"></span>）。判定区分は道路橋の定期点検（5年に1回）の結果で、Ⅰ健全・Ⅱ予防保全段階・Ⅲ早期措置段階・Ⅳ緊急措置段階。「判定なし」はデータベースに判定が入っていない橋です。年数は架設年度から数えた目安で、架設年度が分からない橋は「不明」にしています。地図の点は管理者が登録した位置で、ずれていることがあります。</p>
+    <p>点検の結果は橋の管理者（国・都道府県・市区町村・高速道路会社など）が出したものです。このページは見て楽しむためのもので、通行してよいかどうかの判断には使えません。</p>
+  </section>
+</div>
+
+<script>
+"use strict";
+const NOW=2026;
+const PREF=["","北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
+const H=[{k:1,t:"Ⅰ 健全",s:"Ⅰ"},{k:2,t:"Ⅱ 予防保全",s:"Ⅱ"},{k:3,t:"Ⅲ 早期措置",s:"Ⅲ"},{k:4,t:"Ⅳ 緊急措置",s:"Ⅳ"},{k:0,t:"判定なし",s:"なし"}];
+const HL={1:"Ⅰ 健全",2:"Ⅱ 予防保全段階",3:"Ⅲ 早期措置段階",4:"Ⅳ 緊急措置段階",0:"判定なし"};
+const A=[{k:0,t:"30年未満",lo:0,hi:29},{k:1,t:"30〜49年",lo:30,hi:49},{k:2,t:"50〜69年",lo:50,hi:69},{k:3,t:"70〜99年",lo:70,hi:99},{k:4,t:"100年以上",lo:100,hi:9999},{k:5,t:"不明"}];
+const K=[{k:1,t:"国"},{k:2,t:"都道府県"},{k:4,t:"政令市"},{k:5,t:"市区町村"},{k:6,t:"高速道路会社"},{k:3,t:"道路公社"}];
+const KL={1:"国",2:"都道府県",3:"道路公社",4:"政令市",5:"市区町村",6:"高速道路会社"};
+const L=[{k:0,t:"ぜんぶ",m:0},{k:1,t:"15m以上",m:150},{k:2,t:"100m以上",m:1000},{k:3,t:"500m以上",m:5000}];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=n=>n.toLocaleString("ja-JP");
+
+// ---------- データ ----------
+let N=0,X,Y,YR,LN,HT,KB,TN,AB,PF,META,GEO;
+const DET={};               // 県ごとの詳細（必要になったら読む）
+const st={h:new Set(),a:new Set(),k:new Set(),l:0,pref:0,color:"h",sel:-1,listN:50,sort:"r34"};
+let pass;                   // 条件に合う橋 = 1
+let orderH,orderA;          // 重ねる順（悪い・古いほど上に）
+
+function ageBin(y){if(!y)return 5;const a=NOW-y;return a<30?0:a<50?1:a<70?2:a<100?3:4}
+async function load(){
+  const [m,g,b]=await Promise.all([fetch("data/meta.json").then(r=>r.json()),fetch("data/geo.json").then(r=>r.json()),fetch("data/pts.txt").then(r=>r.text()).then(t=>{const s=atob(t.trim()),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u.buffer})]);
+  META=m;GEO=g;N=m.n;let o=0;
+  const u16=()=>{const a=new Uint16Array(b.slice(o,o+N*2));o+=N*2;return a}, u8=()=>{const a=new Uint8Array(b,o,N);o+=N;return a};
+  X=u16();Y=u16();YR=u16();LN=u16();HT=u8();KB=u8();TN=u8();
+  AB=new Uint8Array(N);PF=new Uint8Array(N);
+  for(let i=0;i<N;i++)AB[i]=ageBin(YR[i]);
+  for(const [p,s,e] of m.prefs)PF.fill(p,s,e);
+  const idx=[...Array(N).keys()];// 判定なし(0)・不明をいちばん下に
+  orderH=Uint32Array.from(idx.sort((a,b)=>((HT[a]?HT[a]:-1)-(HT[b]?HT[b]:-1))));
+  orderA=Uint32Array.from([...Array(N).keys()].sort((a,b)=>((AB[a]===5?-1:AB[a])-(AB[b]===5?-1:AB[b]))));
+  pass=new Uint8Array(N);
+}
+function detail(p){if(!DET[p])DET[p]=fetch(`data/d/${String(p).padStart(2,"0")}.json`).then(r=>r.json());return DET[p]}
+
+// ---------- 絞り込み ----------
+function kOf(i){const k=KB[i];return KL[k]?k:0}
+function compute(){
+  const mL=L[st.l].m;
+  for(let i=0;i<N;i++){
+    pass[i]=(!st.h.size||st.h.has(HT[i]))&&(!st.a.size||st.a.has(AB[i]))&&(!st.k.size||st.k.has(kOf(i)))&&LN[i]>=mL&&(!st.pref||PF[i]===st.pref)?1:0;
+  }
+}
+// 判定区分と年数をのぞいた条件での 年数×判定 の表
+function base(i){return (!st.k.size||st.k.has(kOf(i)))&&LN[i]>=L[st.l].m&&(!st.pref||PF[i]===st.pref)}
+
+// ---------- 色 ----------
+let CH={},CA={};
+function readColors(){const cs=getComputedStyle(document.documentElement);const rgb=v=>{const h=cs.getPropertyValue(v).trim();return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]};
+  CH={0:rgb("--h0"),1:rgb("--h1"),2:rgb("--h2"),3:rgb("--h3"),4:rgb("--h4")};CA={0:rgb("--a0"),1:rgb("--a1"),2:rgb("--a2"),3:rgb("--a3"),4:rgb("--a4"),5:rgb("--ax")};
+  return cs}
+const hvar=k=>`var(--h${k})`, avar=k=>k===5?"var(--ax)":`var(--a${k})`;
+
+// ---------- 地図 ----------
+const wrap=$("#map"),cvB=$("#cv-base"),cvP=$("#cv-pts");
+let W=0,Hh=0,dpr=1,view={k:1,tx:0,ty:0},k0=1,raf=0;
+function sizeCanvas(){dpr=Math.min(2,window.devicePixelRatio||1);W=wrap.clientWidth;Hh=wrap.clientHeight;for(const c of [cvB,cvP]){c.width=Math.round(W*dpr);c.height=Math.round(Hh*dpr)}}
+function fit(b,pad=16){const [x0,y0,x1,y1]=b;const k=Math.min((W-pad*2)/(x1-x0),(Hh-pad*2)/(y1-y0));return {k,tx:W/2-(x0+x1)/2*k,ty:Hh/2-(y0+y1)/2*k}}
+const FULL=[0,-2,660,650];
+function home(){view=fit(FULL,8);k0=view.k}
+function req(){if(!raf)raf=requestAnimationFrame(()=>{raf=0;draw()})}
+function draw(){if(!cvB.width||!cvB.height||!GEO)return;
+  const cs=getComputedStyle(document.documentElement);const c=cvB.getContext("2d");
+  c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,cvB.width,cvB.height);
+  c.setTransform(view.k*dpr,0,0,view.k*dpr,view.tx*dpr,view.ty*dpr);
+  // 陸地
+  c.beginPath();for(const poly of GEO.land)for(const r of poly){c.moveTo(r[0],r[1]);for(let i=2;i<r.length;i+=2)c.lineTo(r[i],r[i+1]);c.closePath()}
+  c.fillStyle=cs.getPropertyValue("--land");c.fill("evenodd");
+  const z=view.k/k0;
+  if(z>3){c.beginPath();for(const r of GEO.mm){c.moveTo(r[0],r[1]);for(let i=2;i<r.length;i+=2)c.lineTo(r[i],r[i+1])}c.strokeStyle=cs.getPropertyValue("--muni");c.lineWidth=0.8/view.k;c.stroke()}
+  c.beginPath();for(const r of GEO.pm){c.moveTo(r[0],r[1]);for(let i=2;i<r.length;i+=2)c.lineTo(r[i],r[i+1])}
+  c.strokeStyle=cs.getPropertyValue("--edge");c.lineWidth=(z>3?1.4:0.9)/view.k;c.stroke();
+  c.beginPath();for(const poly of GEO.land)for(const r of poly){c.moveTo(r[0],r[1]);for(let i=2;i<r.length;i+=2)c.lineTo(r[i],r[i+1]);c.closePath()}
+  c.lineWidth=0.9/view.k;c.stroke();
+  drawPts();
+}
+function drawPts(){
+  const w=cvP.width,h=cvP.height,ctx=cvP.getContext("2d");
+  const img=ctx.createImageData(w,h),px=new Uint32Array(img.data.buffer);
+  const z=view.k/k0;const s=Math.max(1,Math.round(dpr*Math.min(5,0.9+Math.log2(Math.max(1,z))*0.75)));const hs=s>>1;
+  const kk=view.k*dpr/META.sx,tx=view.tx*dpr,ty=view.ty*dpr-META.oy*view.k*dpr;
+  const pal=st.color==="h"?CH:CA,ord=st.color==="h"?orderH:orderA,key=st.color==="h"?HT:AB;
+  const col={};for(const k in pal){const [r,g,b]=pal[k];col[k]=(255<<24)|(b<<16)|(g<<8)|r}
+  for(let j=0;j<N;j++){const i=ord[j];if(!pass[i])continue;
+    const x=(X[i]*kk+tx)|0,y=(Y[i]*kk+ty)|0;if(x<-hs||y<-hs||x>=w+hs||y>=h+hs)continue;
+    const cl=col[key[i]];
+    for(let dy=-hs;dy<s-hs;dy++){const yy=y+dy;if(yy<0||yy>=h)continue;const row=yy*w;for(let dx=-hs;dx<s-hs;dx++){const xx=x+dx;if(xx>=0&&xx<w)px[row+xx]=cl}}
+  }
+  ctx.putImageData(img,0,0);
+  if(st.sel>=0){const i=st.sel;const x=X[i]*kk+tx,y=Y[i]*kk+ty;ctx.lineWidth=2*dpr;ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--ink");ctx.beginPath();ctx.arc(x,y,(s+6)*1.0+3*dpr,0,7);ctx.stroke()}
+}
+function zoomAt(f,cx,cy){const k=Math.max(k0*0.8,Math.min(k0*600,view.k*f));const r=k/view.k;view.tx=cx-(cx-view.tx)*r;view.ty=cy-(cy-view.ty)*r;view.k=k;req()}
+function animateTo(v){const a={...view},t0=performance.now(),D=matchMedia("(prefers-reduced-motion:reduce)").matches?0:450;
+  const lk0=Math.log(a.k),lk1=Math.log(v.k);
+  const step=t=>{let u=D?Math.min(1,(t-t0)/D):1;u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;const k=Math.exp(lk0+(lk1-lk0)*u);
+    // 画面中央の地点を線形に動かす
+    const cx0=(W/2-a.tx)/a.k,cy0=(Hh/2-a.ty)/a.k,cx1=(W/2-v.tx)/v.k,cy1=(Hh/2-v.ty)/v.k;const cx=cx0+(cx1-cx0)*u,cy=cy0+(cy1-cy0)*u;
+    view={k,tx:W/2-cx*k,ty:Hh/2-cy*k};draw();if(u<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+// ドラッグ・ピンチ
+const ptrs=new Map();let moved=0,downAt=null,pinch=null;
+wrap.addEventListener("pointerdown",e=>{if(e.target.closest("button,.legend"))return;wrap.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.offsetX,y:e.offsetY});moved=0;downAt={x:e.offsetX,y:e.offsetY};wrap.classList.add("drag");
+  if(ptrs.size===2){const [p,q]=[...ptrs.values()];pinch={d:Math.hypot(p.x-q.x,p.y-q.y)}}});
+wrap.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;const p=ptrs.get(e.pointerId);const dx=e.offsetX-p.x,dy=e.offsetY-p.y;
+  if(ptrs.size===1){view.tx+=dx;view.ty+=dy;moved+=Math.abs(dx)+Math.abs(dy);req()}
+  p.x=e.offsetX;p.y=e.offsetY;
+  if(ptrs.size===2&&pinch){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch.d>0)zoomAt(d/pinch.d,(a.x+b.x)/2,(a.y+b.y)/2);pinch.d=d;moved+=10}});
+const up=e=>{if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(!ptrs.size){wrap.classList.remove("drag");if(moved<6&&downAt&&e.type==="pointerup")pick(downAt.x,downAt.y)}};
+wrap.addEventListener("pointerup",up);wrap.addEventListener("pointercancel",up);
+wrap.addEventListener("wheel",e=>{e.preventDefault();zoomAt(Math.exp(-e.deltaY*(e.deltaMode?0.05:0.0018)),e.offsetX,e.offsetY)},{passive:false});
+wrap.addEventListener("dblclick",e=>{if(e.target.closest("button"))return;zoomAt(2.5,e.offsetX,e.offsetY)});
+$("#zin").onclick=()=>zoomAt(2,W/2,Hh/2);$("#zout").onclick=()=>zoomAt(.5,W/2,Hh/2);
+$("#zall").onclick=()=>{setPref(0)};
+function pick(sx,sy){
+  const kk=view.k/META.sx;let best=-1,bd=(14)**2;
+  for(let i=0;i<N;i++){if(!pass[i])continue;const dx=X[i]*kk+view.tx-sx,dy=(Y[i]*kk)-META.oy*view.k+view.ty-sy;const d=dx*dx+dy*dy;if(d<bd||(d===bd&&HT[i]>HT[best])){bd=d;best=i}}
+  select(best,false);
+}
+
+// ---------- えらんだ橋 ----------
+async function select(i,center){
+  st.sel=i;req();
+  const box=$("#info");
+  if(i<0){box.innerHTML=`<h3>えらんだ橋</h3><p class="empty">地図の点をタップすると、橋の名前・かけた年・点検の結果が出ます。</p>`;markList();return}
+  if(center){const k=Math.max(view.k,k0*40);animateTo({k,tx:W/2-X[i]/META.sx*k,ty:Hh/2-(Y[i]/META.sx-META.oy)*k})}
+  const p=PF[i],start=META.prefs.find(r=>r[0]===p)[1];
+  box.innerHTML=`<h3>えらんだ橋</h3><p class="empty">読みこみ中…</p>`;
+  const d=await detail(p);if(st.sel!==i)return;
+  const [nm,ci,mi,ro,wd,tn,lat,lon]=d.r[i-start];
+  const y=YR[i],age=y?NOW-y:null,h=HT[i];
+  box.innerHTML=`<h3>えらんだ橋</h3>
+   <p class="bname">${esc(nm||"（名前なし）")}</p>
+   <p class="bsub">${esc(PREF[p])} ${esc(d.c[ci])}${ro?" ・ "+esc(ro):""}</p>
+   <dl class="kv">
+    <dt>判定区分</dt><dd><span class="badge${h===2?" lt":""}" style="--c:${hvar(h)}">${HL[h]}</span>${tn?` <small>（${tn}年度の点検）</small>`:""}</dd>
+    <dt>かけた年</dt><dd>${y?`${y}年度（築およそ${age}年）`:"不明"}</dd>
+    <dt>橋の長さ</dt><dd>${LN[i]?(LN[i]/10).toLocaleString("ja-JP")+" m":"—"}${wd?` ・ 幅 ${wd} m`:""}</dd>
+    <dt>管理者</dt><dd>${esc(d.m[mi])}（${KL[KB[i]]||"その他"}）</dd>
+   </dl>
+   <p style="margin:8px 0 0"><a class="ext" href="https://maps.gsi.go.jp/#17/${lat}/${lon}/" target="_blank" rel="noopener">地理院地図で見る</a> ・ <a class="ext" href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" rel="noopener">Googleマップ</a></p>`;
+  markList();
+}
+
+// ---------- 絞り込みの部品 ----------
+function chipRow(sel,items,set,cvar){
+  const row=$(sel);row.querySelectorAll(".chip").forEach(b=>b.remove());
+  for(const it of items){const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.k=it.k;
+    b.innerHTML=`${cvar?`<i style="--c:${cvar(it.k)}"></i>`:""}${it.t}<span class="n"></span>`;
+    b.onclick=()=>{set.has(it.k)?set.delete(it.k):set.add(it.k);update()};row.appendChild(b)}
+}
+function lenRow(){const row=$("#f-l");for(const it of L){const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.k=it.k;b.textContent=it.t;b.onclick=()=>{st.l=it.k;update()};row.appendChild(b)}}
+const PRESETS=[
+  {t:"築50年以上で判定Ⅲ",f:()=>{st.h=new Set([3]);st.a=new Set([2,3,4])}},
+  {t:"判定Ⅳ（緊急措置）",f:()=>{st.h=new Set([4]);st.a.clear()}},
+  {t:"築100年以上",f:()=>{st.a=new Set([4]);st.h.clear()}},
+  {t:"判定Ⅲ・Ⅳ",f:()=>{st.h=new Set([3,4]);st.a.clear()}},
+  {t:"大きい橋（100m以上）",f:()=>{st.l=2}},
+];
+function presets(){const el=$("#presets");PRESETS.forEach(p=>{const b=document.createElement("button");b.type="button";b.className="preset";b.textContent=p.t;b.onclick=()=>{p.f();update()};el.appendChild(b)})}
+function prefSelect(){const s=$("#pref");s.innerHTML=`<option value="0">全国</option>`+PREF.slice(1).map((n,i)=>`<option value="${i+1}">${n}</option>`).join("");s.onchange=()=>setPref(+s.value)}
+function setPref(p){st.pref=p;$("#pref").value=p;st.listN=50;update();animateTo(p?fit(GEO.bb[p],20):fit(FULL,8));try{history.replaceState(null,"",p?"#p"+p:location.pathname+location.search)}catch(e){}}
+
+// ---------- 集計して描く ----------
+function update(){
+  compute();
+  // 件数
+  let n=0,c34=0;for(let i=0;i<N;i++)if(pass[i]){n++;if(HT[i]>=3)c34++}
+  $("#count").innerHTML=`<b>${fmt(n)}</b> 橋`;
+  // ボタンの状態と数（他の条件をそのままにしたときの数）
+  const cntH=new Map(),cntA=new Map(),cntK=new Map();
+  const mL=L[st.l].m;
+  for(let i=0;i<N;i++){if(LN[i]<mL||(st.pref&&PF[i]!==st.pref))continue;const h=HT[i],a=AB[i],k=kOf(i);
+    const okH=!st.h.size||st.h.has(h),okA=!st.a.size||st.a.has(a),okK=!st.k.size||st.k.has(k);
+    if(okA&&okK)cntH.set(h,(cntH.get(h)||0)+1);if(okH&&okK)cntA.set(a,(cntA.get(a)||0)+1);if(okH&&okA)cntK.set(k,(cntK.get(k)||0)+1)}
+  const paint=(sel,set,cnt)=>$(sel).querySelectorAll(".chip").forEach(b=>{const k=+b.dataset.k;b.setAttribute("aria-pressed",set.has(k));const c=cnt.get(k)||0;b.querySelector(".n").textContent=fmt(c);b.classList.toggle("off",!c)});
+  paint("#f-h",st.h,cntH);paint("#f-a",st.a,cntA);paint("#f-k",st.k,cntK);
+  $("#f-l").querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.k===st.l));
+  if(st.sel>=0&&!pass[st.sel])select(-1);
+  req();renderMatrix();renderHist();renderPrefs();renderList();renderLegend();
+}
+function renderLegend(){
+  const items=st.color==="h"?H.map(h=>`<span><i style="--c:${hvar(h.k)}"></i>${h.t}</span>`):A.map(a=>`<span><i style="--c:${avar(a.k)}"></i>${a.k===5?"かけた年が不明":"築"+a.t}</span>`);
+  $("#legend").innerHTML=items.join("");
+}
+function renderMatrix(){
+  const m=A.map(()=>[0,0,0,0,0]);
+  for(let i=0;i<N;i++)if(base(i))m[AB[i]][HT[i]]++;
+  const hk=[1,2,3,4,0];
+  const rowT=m.map(r=>r.reduce((a,b)=>a+b,0)),colT=hk.map(h=>m.reduce((a,r)=>a+r[h],0));
+  const mx=Math.max(1,...m.flatMap(r=>r));
+  let s=`<thead><tr><th>年数＼判定</th>${hk.map(h=>`<th><span class="dot" style="--c:${hvar(h)}"></span>${H.find(x=>x.k===h).s}</th>`).join("")}<th>計</th></tr></thead><tbody>`;
+  A.forEach((a,ai)=>{s+=`<tr><th>${a.t}</th>`+hk.map(h=>{const v=m[ai][h];const on=st.h.size===1&&st.h.has(h)&&st.a.size===1&&st.a.has(a.k);
+    return `<td><button type="button" class="${on?"on":""}" data-a="${a.k}" data-h="${h}" style="--c:${hvar(h)};--v:${(Math.sqrt(v/mx)*0.55).toFixed(3)}" title="${a.t}・${HL[h]}">${fmt(v)}</button></td>`}).join("")+`<td style="padding:4px 5px;color:var(--muted)">${fmt(rowT[ai])}</td></tr>`});
+  s+=`<tr class="tot"><td>計</td>${colT.map(v=>`<td>${fmt(v)}</td>`).join("")}<td>${fmt(rowT.reduce((a,b)=>a+b,0))}</td></tr></tbody>`;
+  const t=$("#matrix");t.innerHTML=s;
+  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{const a=+b.dataset.a,h=+b.dataset.h;if(b.classList.contains("on")){st.h.clear();st.a.clear()}else{st.h=new Set([h]);st.a=new Set([a])}update()});
+}
+function renderHist(){
+  // 1900〜2025 を 5年ごと。それより前は 1つにまとめる。判定区分で積み上げ。
+  const B0=1900,BW=5,NB=(2030-B0)/BW;const bins=Array.from({length:NB+1},()=>[0,0,0,0,0]);let unk=0;
+  const mL=L[st.l].m;
+  for(let i=0;i<N;i++){if(!pass[i])continue;const y=YR[i];if(!y){unk++;continue}const b=y<B0?0:1+Math.floor((y-B0)/BW);bins[Math.min(NB,b)][HT[i]]++}
+  const tot=bins.map(r=>r.reduce((a,b)=>a+b,0));const mx=Math.max(1,...tot);
+  const Wd=900,Ht=230,ml=46,mb=22,mt=8,bw=(Wd-ml-6)/bins.length;
+  const nice=v=>{const p=Math.pow(10,Math.floor(Math.log10(v)));return [1,2,5,10].map(x=>x*p).find(x=>x>=v/4)};const step=nice(mx);
+  let g="";for(let v=0;v<=mx;v+=step){const y=Ht-mb-(v/mx)*(Ht-mb-mt);g+=`<line x1="${ml}" x2="${Wd}" y1="${y}" y2="${y}"/><text x="${ml-6}" y="${y+3}" text-anchor="end">${fmt(v)}</text>`}
+  let r="";bins.forEach((row,bi)=>{let y=Ht-mb;for(const h of [1,2,3,4,0]){const v=row[h];if(!v)continue;const hh=v/mx*(Ht-mb-mt);y-=hh;r+=`<rect x="${(ml+bi*bw+0.5).toFixed(1)}" y="${y.toFixed(1)}" width="${(bw-1).toFixed(1)}" height="${hh.toFixed(1)}" fill="${hvar(h)}"><title>${bi?`${B0+(bi-1)*BW}〜${B0+(bi-1)*BW+4}年`:"1899年以前"} ${HL[h]} ${fmt(v)}橋</title></rect>`}});
+  let x="";for(let yv=1900;yv<=2020;yv+=20){const bi=1+(yv-B0)/BW;x+=`<text x="${ml+bi*bw}" y="${Ht-6}" text-anchor="middle">${yv}</text>`}
+  x+=`<text x="${ml+bw/2}" y="${Ht-6}" text-anchor="middle">前</text>`;
+  $("#hist").innerHTML=`<div class="wrapx"><svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="かけられた年ごとの橋の数（判定区分で色分け）" style="min-width:560px">${g}${r}${x}</svg></div>`;
+  $("#hist-sub").textContent=`いまの条件で ${fmt(tot.reduce((a,b)=>a+b,0))}橋（かけた年が不明の ${fmt(unk)}橋はのぞく）`;
+}
+let psort={k:"r34",d:-1};
+function renderPrefs(){
+  // 都道府県ごと: 条件に合う数、そのうち判定Ⅲ・Ⅳの割合、築50年以上の割合
+  const n=new Array(48).fill(0),c34=new Array(48).fill(0),h=new Array(48).fill(0),o50=new Array(48).fill(0),yk=new Array(48).fill(0);
+  // 割合は その列の条件（判定区分／年数）だけをはずして数える。そうしないと「判定Ⅲだけ」のとき100%になる
+  const mL=L[st.l].m;
+  for(let i=0;i<N;i++){if(LN[i]<mL||(st.k.size&&!st.k.has(kOf(i))))continue;const p=PF[i];
+    const okH=!st.h.size||st.h.has(HT[i]),okA=!st.a.size||st.a.has(AB[i]);
+    if(okH&&okA)n[p]++;
+    if(okA&&HT[i]){h[p]++;if(HT[i]>=3)c34[p]++}
+    if(okH&&YR[i]){yk[p]++;if(NOW-YR[i]>=50)o50[p]++}}
+  const rows=[];for(let p=1;p<=47;p++)rows.push({p,n:n[p],r34:h[p]?c34[p]/h[p]:0,c34:c34[p],o50:yk[p]?o50[p]/yk[p]:0});
+  rows.sort((a,b)=>(a[psort.k]-b[psort.k])*psort.d||a.p-b.p);
+  const mr=Math.max(.0001,...rows.map(r=>r.r34));
+  const th=(k,t,cls="")=>`<th class="${cls}" data-k="${k}">${t}${psort.k===k?(psort.d<0?" ▼":" ▲"):""}</th>`;
+  $("#ptable").innerHTML=`<thead><tr>${th("p","都道府県")}${th("n","条件に合う橋","num")}${th("r34","Ⅲ・Ⅳの割合","num")}${th("o50","築50年以上","num")}</tr></thead><tbody>`+
+   rows.map(r=>`<tr data-p="${r.p}" class="${st.pref===r.p?"sel":""}"><td>${PREF[r.p]}</td><td class="num">${fmt(r.n)}</td><td class="num">${(r.r34*100).toFixed(1)}%<span class="bar" style="width:${(r.r34/mr*48).toFixed(0)}px"></span></td><td class="num">${(r.o50*100).toFixed(0)}%</td></tr>`).join("")+"</tbody>";
+  $("#ptable").querySelectorAll("th").forEach(t=>t.onclick=()=>{const k=t.dataset.k;psort=psort.k===k?{k,d:-psort.d}:{k,d:k==="p"?1:-1};renderPrefs()});
+  $("#ptable").querySelectorAll("tbody tr").forEach(t=>t.onclick=()=>{const p=+t.dataset.p;setPref(st.pref===p?0:p)});
+}
+function passNoPref(i){return (!st.h.size||st.h.has(HT[i]))&&(!st.a.size||st.a.has(AB[i]))&&(!st.k.size||st.k.has(kOf(i)))&&LN[i]>=L[st.l].m}
+let listToken=0;
+async function renderList(){
+  const el=$("#list"),tok=++listToken;
+  if(!st.pref){
+    // 全国では 長い順に上位だけ（名前は県ごとに読む）
+    let idx=[];for(let i=0;i<N;i++)if(pass[i])idx.push(i);
+    $("#list-sub").textContent=idx.length>st.listN?`いまの条件の ${fmt(idx.length)}橋のうち、判定が悪く古い順に ${st.listN}橋`:`いまの条件の ${fmt(idx.length)}橋`;
+    idx.sort((a,b)=>(HT[b]||0)-(HT[a]||0)||(YR[a]||9999)-(YR[b]||9999)||LN[b]-LN[a]);idx=idx.slice(0,st.listN);
+    const need=[...new Set(idx.map(i=>PF[i]))];
+    if(need.length>6){el.innerHTML=`<p class="note">全国から ${fmt(idx.length)}橋を出すと読みこみが重くなるので、都道府県を選ぶか、条件をしぼってください。</p>`;return}
+    el.innerHTML=`<p class="note">読みこみ中…</p>`;await Promise.all(need.map(detail));if(tok!==listToken)return;return listTable(el,idx);
+  }
+  let idx=[];for(let i=0;i<N;i++)if(pass[i])idx.push(i);
+  $("#list-sub").textContent=`${PREF[st.pref]}・いまの条件で ${fmt(idx.length)}橋（判定が悪く古い順）`;
+  idx.sort((a,b)=>(HT[b]||0)-(HT[a]||0)||(YR[a]||9999)-(YR[b]||9999)||LN[b]-LN[a]);
+  el.innerHTML=`<p class="note">読みこみ中…</p>`;await detail(st.pref);if(tok!==listToken)return;
+  listTable(el,idx.slice(0,st.listN),idx.length);
+}
+async function listTable(el,idx,total){
+  const ds={};for(const i of idx){const p=PF[i];ds[p]=ds[p]||await detail(p)}
+  const st0=Object.fromEntries(META.prefs.map(r=>[r[0],r[1]]));
+  el.innerHTML=idx.length?`<div class="scroll"><table class="tbl"><thead><tr><th>橋</th><th>場所</th><th class="num">かけた年</th><th class="num">長さ</th><th>判定</th></tr></thead><tbody>`+
+   idx.map(i=>{const d=ds[PF[i]],r=d.r[i-st0[PF[i]]];return `<tr data-i="${i}" class="${st.sel===i?"sel":""}"><td>${esc(r[0]||"（名前なし）")}</td><td>${esc(st.pref?d.c[r[1]]:PREF[PF[i]]+" "+d.c[r[1]])}</td><td class="num">${YR[i]||"不明"}</td><td class="num">${LN[i]?(LN[i]/10).toFixed(0)+"m":"—"}</td><td><span class="dot" style="--c:${hvar(HT[i])}"></span>${H.find(x=>x.k===HT[i]).s}</td></tr>`}).join("")+`</tbody></table></div>`+
+   (total>idx.length?`<button type="button" class="more" id="more">あと${fmt(Math.min(200,total-idx.length))}橋を出す</button>`:""):`<p class="note">条件に合う橋はありません。</p>`;
+  el.querySelectorAll("tbody tr").forEach(t=>t.onclick=()=>select(+t.dataset.i,true));
+  const mb=$("#more");if(mb)mb.onclick=()=>{st.listN+=200;renderList()};
+}
+function markList(){document.querySelectorAll("#list tbody tr").forEach(t=>t.classList.toggle("sel",+t.dataset.i===st.sel))}
+
+function renderStats(){
+  let c34=0,c4=0,o50=0,yk=0,h=0;for(let i=0;i<N;i++){if(HT[i]){h++;if(HT[i]>=3)c34++;if(HT[i]===4)c4++}if(YR[i]){yk++;if(NOW-YR[i]>=50)o50++}}
+  $("#stats").innerHTML=`<span><b>${fmt(N)}</b>橋</span><span><b>${(c34/h*100).toFixed(1)}%</b>が判定Ⅲ・Ⅳ</span><span><b>${fmt(c4)}</b>橋が判定Ⅳ</span><span><b>${(o50/yk*100).toFixed(0)}%</b>が築50年以上</span>`;
+  $("#upd").textContent=META.updated;
+}
+
+// ---------- はじめ ----------
+document.querySelectorAll(".colorby button").forEach(b=>b.onclick=()=>{st.color=b.dataset.c;document.querySelectorAll(".colorby button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderLegend();req()});
+$("#reset").onclick=()=>{st.h.clear();st.a.clear();st.k.clear();st.l=0;update()};
+chipRow("#f-h",H,st.h,hvar);chipRow("#f-a",A,st.a,avar);chipRow("#f-k",K,st.k,null);lenRow();presets();prefSelect();renderLegend();
+const mqDark=matchMedia("(prefers-color-scheme: dark)");
+new MutationObserver(()=>{readColors();req()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme","class","style"]});
+mqDark.addEventListener?.("change",()=>{readColors();req()});
+new ResizeObserver(()=>{if(!GEO)return;const c=[(W/2-view.tx)/view.k,(Hh/2-view.ty)/view.k];sizeCanvas();const z=view.k/k0;home();view.k=k0*z;view.tx=W/2-c[0]*view.k;view.ty=Hh/2-c[1]*view.k;draw()}).observe(wrap);
+(async()=>{
+  try{await load()}catch(e){$("#loading").textContent="データを読みこめませんでした。ページを開きなおしてください。";return}
+  readColors();sizeCanvas();home();
+  const m=/^#p(\d+)$/.exec(location.hash);if(m&&+m[1]>=1&&+m[1]<=47){st.pref=+m[1];$("#pref").value=st.pref;view=fit(GEO.bb[st.pref],20)}
+  $("#loading").hidden=true;renderStats();update();
+})();
+</script>
