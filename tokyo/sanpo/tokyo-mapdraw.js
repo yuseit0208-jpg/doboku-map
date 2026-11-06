@@ -1,7 +1,7 @@
 // 東京 土木建築名所帖 — 地図の描画（台帳ページと散歩地図冊子で共用）
 // 依存: tokyo-data.js (CATS, D), tokyo-maps.js (TOKYO_MAPS)
 (function () {
-  var AREA_KEYS = ["marunouchi", "sumida", "ueno", "wangan"];
+  var AREA_KEYS = ["marunouchi", "sumida", "ueno", "wangan", "ochanomizu", "aoyama"].filter(function (k) { return TOKYO_MAPS[k]; });
 
   function proj(m) {
     var s = m.bbox[0], w = m.bbox[1], n = m.bbox[2], e = m.bbox[3];
@@ -86,7 +86,7 @@
           "<title>" + esc(s.d.name) + "</title></g>");
       });
     }
-    h.push('<text class="m-credit" x="' + (m.w - 8) + '" y="' + (m.h - 8) + '">© OpenStreetMap contributors</text>');
+    h.push('<text class="m-credit" x="' + (m.w - 8) + '" y="' + (m.h - 8) + '">' + esc(m.credit || "© OpenStreetMap contributors") + '</text>');
     // 方位と縮尺
     var c = Math.cos(m.lat0 * Math.PI / 180), mpp = (m.bbox[3] - m.bbox[1]) * c * 111320 / m.w;
     var nice = [100, 200, 250, 500, 1000, 2000, 5000].find(function (v) { return v / mpp > 90; }) || 1000;
