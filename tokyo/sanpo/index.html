@@ -7,26 +7,27 @@
 <title>東京 土木建築散歩</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F4F0E5;--paper:#FFFDF7;--ink:#1F2326;--ink2:#5C6368;--ink3:#8A9094;--rule:#DCD5C4;--accent:#D8433F;--ok:#1F8077;--me:#2F6FD6;
-  --c-bridge:#2F5E86;--c-rail:#7A4E9A;--c-water:#1F8077;--c-port:#4C6E2E;--c-tower:#B5462E;--c-modern:#8A6A1F;--c-post:#3A3F44;
-  --m-land:#F2EEE2;--m-water:#C7DAE1;--m-park:#A8CBB2;--m-road:#D6D3CA;--m-road2:#C3BFB5;--m-rail:#7C8287;--m-star:#D8433F;--m-label:#6C7A73;--m-navy:#2C4E8C;
-  --f-disp:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
-  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --bg:#FFF7EE;--paper:#FFFFFF;--ink:#2E2B36;--ink2:#6E6A78;--ink3:#A29EAB;--rule:#F1E5D6;--accent:#FF6B5B;--ok:#22A88E;--me:#3D7BF2;
+  --c-bridge:#4A86D9;--c-rail:#9B6BD6;--c-water:#22A88E;--c-port:#6BA34A;--c-tower:#F2784B;--c-modern:#D9A21E;--c-post:#5C6170;
+  --m-land:#F7F0E2;--m-water:#BFE3F4;--m-park:#CDEBC6;--m-road:#FFFFFF;--m-road2:#FFDDB0;--m-rail:#C2BBD3;--m-star:#FF6B5B;--m-label:#8C8798;--m-navy:#FF6B5B;
+  --shadow:0 6px 22px rgb(140 100 60 / .12);--pin:#FFFFFF;
+  --f-disp:"Zen Maru Gothic","Hiragino Maru Gothic ProN","BIZ UDPGothic",sans-serif;
+  --f-body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   --tabh:62px;--safe-b:env(safe-area-inset-bottom,0px);
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#171C20;--paper:#1F262B;--ink:#E8E6E0;--ink2:#A9B0B4;--ink3:#7C858A;--rule:#343E45;--accent:#F06A5E;--ok:#5CC2B5;--me:#6FA3F5;
   --c-bridge:#7FB1DB;--c-rail:#B79AD6;--c-water:#5CC2B5;--c-port:#9BC173;--c-tower:#E58569;--c-modern:#D4B467;--c-post:#B9C0C5;
-  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#8DB3E6;
+  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#FF8A7D;--shadow:0 6px 22px rgb(0 0 0 / .35);--pin:#F4EFE8;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#171C20;--paper:#1F262B;--ink:#E8E6E0;--ink2:#A9B0B4;--ink3:#7C858A;--rule:#343E45;--accent:#F06A5E;--ok:#5CC2B5;--me:#6FA3F5;
   --c-bridge:#7FB1DB;--c-rail:#B79AD6;--c-water:#5CC2B5;--c-port:#9BC173;--c-tower:#E58569;--c-modern:#D4B467;--c-post:#B9C0C5;
-  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#8DB3E6;
+  --m-land:#232B31;--m-water:#1C3A48;--m-park:#2E4B3A;--m-road:#38434A;--m-road2:#49545B;--m-rail:#8C969C;--m-star:#F06A5E;--m-label:#A3B4AC;--m-navy:#FF8A7D;--shadow:0 6px 22px rgb(0 0 0 / .35);--pin:#F4EFE8;
   color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -39,7 +40,7 @@ button{font:inherit;color:inherit}
 .top .wrap{display:flex;align-items:center;gap:12px;height:56px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
 .brand svg{flex:none}
-.brand b{font:800 19px/1.1 var(--f-disp);letter-spacing:.06em;white-space:nowrap}
+.brand b{font:900 19px/1.1 var(--f-disp);letter-spacing:.06em;white-space:nowrap}
 .brand small{display:block;font-size:11px;color:var(--ink2);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prog{flex:none;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2)}
 .prog .ring{width:34px;height:34px}
@@ -51,7 +52,7 @@ button{font:inherit;color:inherit}
 /* views */
 .view{display:none;padding:14px 0 24px}
 .view.on{display:block}
-h2{font:800 20px/1.3 var(--f-disp);letter-spacing:.05em;margin:4px 0 10px}
+h2{font:900 20px/1.3 var(--f-disp);letter-spacing:.05em;margin:4px 0 10px}
 .muted{color:var(--ink2)}
 .small{font-size:12.5px}
 
@@ -71,7 +72,7 @@ h2{font:800 20px/1.3 var(--f-disp);letter-spacing:.05em;margin:4px 0 10px}
 .mapbox svg:active{cursor:grabbing}
 .mapbox .credit{position:absolute;right:8px;bottom:6px;font-size:10px;color:var(--m-label);background:color-mix(in srgb,var(--m-land) 80%,transparent);padding:0 4px;border-radius:3px;pointer-events:none}
 .mapbox .band{position:absolute;left:10px;top:10px;right:64px;pointer-events:none}
-.mapbox .band b{display:inline-block;background:var(--m-navy);color:#fff;font:800 15px/1 var(--f-disp);letter-spacing:.1em;padding:8px 12px;border-radius:4px}
+.mapbox .band b{display:inline-block;background:var(--m-navy);color:#fff;font:900 15px/1 var(--f-disp);letter-spacing:.1em;padding:8px 12px;border-radius:4px}
 :root[data-theme="dark"] .mapbox .band b{color:#10161A}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mapbox .band b{color:#10161A}}
 .mapbox .band span{display:block;margin-top:4px;font-size:11px;color:var(--m-navy);letter-spacing:.12em;text-transform:uppercase;font-weight:700}
@@ -87,7 +88,7 @@ h2{font:800 20px/1.3 var(--f-disp);letter-spacing:.05em;margin:4px 0 10px}
 .tmap .m-rail-dash{fill:none;stroke:var(--m-land);stroke-width:1.2;stroke-dasharray:6 6}
 .lbl{font:700 13px var(--f-disp);fill:var(--m-label);text-anchor:middle;paint-order:stroke;stroke:var(--m-land);stroke-width:3.5px;letter-spacing:.15em;pointer-events:none}
 .area rect{fill:color-mix(in srgb,var(--m-navy) 8%,transparent);stroke:var(--m-navy);stroke-dasharray:8 4}
-.area text{font:800 13px var(--f-disp);fill:var(--m-navy);paint-order:stroke;stroke:var(--m-land);stroke-width:3.5px}
+.area text{font:900 13px var(--f-disp);fill:var(--m-navy);paint-order:stroke;stroke:var(--m-land);stroke-width:3.5px}
 .area{cursor:pointer}
 .mk{cursor:pointer}
 .mk .star{fill:var(--m-star);stroke:var(--m-land);stroke-width:1.5}
@@ -136,7 +137,7 @@ select.sort{height:42px;border:1px solid var(--rule);border-radius:10px;backgrou
 .meter{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:16px;display:grid;gap:14px}
 @media (min-width:760px){.meter{grid-template-columns:240px 1fr}}
 .big{display:flex;align-items:baseline;gap:6px}
-.big strong{font:800 44px/1 var(--f-disp);font-variant-numeric:tabular-nums}
+.big strong{font:900 44px/1 var(--f-disp);font-variant-numeric:tabular-nums}
 .bar{height:8px;border-radius:4px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden}
 .bar i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .4s}
 .areas{display:grid;gap:9px}
@@ -183,7 +184,7 @@ select.sort{height:42px;border:1px solid var(--rule);border-radius:10px;backgrou
 .phact{display:flex;gap:8px;padding:10px 16px 0}
 .phact .btn{flex:1;min-height:40px;font-size:13px}
 .body{padding:12px 18px 0}
-.body h3{font:800 21px/1.35 var(--f-disp);margin:0 0 6px;letter-spacing:.03em}
+.body h3{font:900 21px/1.35 var(--f-disp);margin:0 0 6px;letter-spacing:.03em}
 .body h3 .n{display:inline-grid;place-items:center;min-width:26px;height:26px;border-radius:13px;background:var(--ink);color:var(--bg);font:700 13px var(--f-body);margin-right:8px;vertical-align:3px;padding:0 6px}
 .badge{display:inline-block;font:500 11px var(--f-body);border:1px solid currentColor;padding:0 6px;border-radius:3px;margin-left:6px;vertical-align:4px;color:var(--c-tower)}
 dl.meta{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:8px 0 10px;font-size:13px}
@@ -200,6 +201,35 @@ dl.meta dt{color:var(--ink3)}dl.meta dd{margin:0}
 .store{font-size:11.5px;color:var(--ink3);margin-top:16px;line-height:1.7}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* 可愛い寄せ（写真地図アプリ風） */
+.mapbox{border:0;border-radius:24px;box-shadow:var(--shadow)}
+.panel,.meter{border:0;border-radius:22px;box-shadow:var(--shadow)}
+.chip{border:0;box-shadow:0 2px 8px rgb(140 100 60 / .10);padding:7px 15px}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mapbox .band b{border-radius:999px;padding:8px 16px;box-shadow:0 3px 10px rgb(255 107 91 / .35)}
+.mapbox .band span{color:var(--ink2)}
+.ctrl{border:0;border-radius:999px;box-shadow:0 3px 10px rgb(140 100 60 / .16)}
+.tile{border:0;border-radius:18px;box-shadow:var(--shadow)}
+.thumb{border-radius:14px}
+.btn{border-radius:999px}
+.search,select.sort,.seg{border-radius:999px}
+.tabs{border-top:0;box-shadow:0 -4px 18px rgb(140 100 60 / .10)}
+.sheet{border-radius:26px 26px 0 0}
+.photo{border-radius:20px}
+.tmap .m-road{stroke:var(--m-road)}
+.tmap .m-rail-dash{stroke:var(--m-land)}
+.mk .pinbg{fill:var(--pin)}
+.mk{filter:drop-shadow(0 2px 4px rgb(90 60 30 / .28))}
+.mk .shd{fill:rgb(60 40 20 / .18)}
+.mk .star{fill:var(--m-star);stroke:none}
+.mk.sel .star{stroke:none}
+.mk .ph{fill:none;stroke:none}
+.mk.sel .pinbg{fill:var(--accent)}
+.mk .noc{fill:var(--accent);stroke:var(--pin);stroke-width:2}
+.mk .not{fill:#fff}
+.mk .dot{stroke:var(--pin);stroke-width:2.5}
+.thumb .no,.body h3 .n{background:var(--accent);color:#fff}
+.thumb{border-color:#F3D9C9}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -449,12 +479,18 @@ const S=n=>n.toFixed(1);
 function starPath(r){return TM.star(0,0,r)}
 function markerHTML(d,no){
   const ph=photo(d.id),sel=selId===d.id,cid="cp-"+d.id;
-  let inner;
+  const pt='<ellipse class="shd" cx="0" cy="1" rx="9" ry="3.5"/><path class="pinbg" d="M-7,-9L0,0L7,-9Z"/>';
+  let inner,top;
   if(ph&&ph.url){
-    const r=sel?22:18;
-    inner='<clipPath id="'+cid+'"><circle r="'+r+'"/></clipPath><image href="'+esc(ph.url)+'" x="'+(-r)+'" y="'+(-r)+'" width="'+2*r+'" height="'+2*r+'" preserveAspectRatio="xMidYMid slice" clip-path="url(#'+cid+')"/><circle class="ph" r="'+r+'" fill="none"/>';
-  }else inner='<path class="star" d="'+starPath(sel?20:15)+'"/>';
-  if(no)inner+='<circle class="noc" cx="16" cy="-16" r="10"/><text class="not" x="16" y="-12">'+no+'</text>';
+    const w=sel?50:42,x=-w/2,y=-8-w,r=12;top=y;
+    inner=pt+'<rect class="pinbg" x="'+x+'" y="'+y+'" width="'+w+'" height="'+w+'" rx="'+(r+2)+'"/>'+
+      '<clipPath id="'+cid+'"><rect x="'+(x+3)+'" y="'+(y+3)+'" width="'+(w-6)+'" height="'+(w-6)+'" rx="'+r+'"/></clipPath>'+
+      '<image href="'+esc(ph.url)+'" x="'+(x+3)+'" y="'+(y+3)+'" width="'+(w-6)+'" height="'+(w-6)+'" preserveAspectRatio="xMidYMid slice" clip-path="url(#'+cid+')"/>';
+  }else{
+    const R=sel?19:16,cy=-8-R;top=cy-R;
+    inner=pt+'<circle class="pinbg" cx="0" cy="'+cy+'" r="'+R+'"/><path class="star" d="'+TM.star(0,cy,R*0.68)+'"/>';
+  }
+  if(no)inner+='<circle class="noc" cx="15" cy="'+(top+2)+'" r="10"/><text class="not" x="15" y="'+(top+6)+'">'+no+'</text>';
   return inner+'<title>'+esc(d.name)+'</title>';
 }
 function dotHTML(d){
