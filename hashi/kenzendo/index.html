@@ -134,7 +134,26 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:0}
 .scroll{max-height:560px;overflow:auto;border-bottom:1px solid var(--hair)}
 .more{all:unset;cursor:pointer;color:var(--frame);font-size:13px;border-bottom:1px solid currentColor;margin-top:8px;display:inline-block}
-.foot{font-size:12px;color:var(--muted);line-height:1.7}
+.words{columns:3 260px;column-gap:20px;margin:8px 0 0}
+.word{border-top:1.5px solid var(--ink);padding-top:6px;min-width:0;break-inside:avoid;margin-bottom:14px}
+.word dt{font:800 17px/1.4 var(--f-title);color:var(--deep)}
+.word dt small{font:500 11px var(--f-num);color:var(--muted);margin-left:8px;letter-spacing:.04em}
+.word dd{margin:2px 0 0;font-size:14px;line-height:1.75}
+.lv{display:grid;gap:6px;margin:8px 0 0;padding:0;list-style:none}
+.lv li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:14px;line-height:1.7}
+.lv .badge{min-width:5.6em;text-align:center}
+.lv b{font-weight:700}
+.mast .src{font-size:13px;margin:6px 0 0}
+.mast .src a{color:#fff}
+.jump{all:unset;cursor:pointer;color:#fff;font-size:13px;border-bottom:1px solid currentColor;justify-self:start;margin-top:6px}
+.mean{font-size:13px;color:var(--muted);margin:2px 0 0;line-height:1.6}
+#q{flex:1 1 200px;min-width:0;border:1px solid var(--hair);background:var(--paper);padding:4px 8px;border-radius:2px;font-size:14px}
+#q:disabled,#city:disabled{opacity:.5}
+.lead{font-size:14px;max-width:72ch;margin:0 0 4px}
+.chk{margin:4px 0 0;padding-left:1.2em}
+.chk li{margin:1px 0}
+.word .who{font-size:12px;color:var(--muted)}
+.foot{font-size:12px;color:var(--muted);color:var(--muted);line-height:1.7}
 .foot a{color:var(--frame)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -143,8 +162,11 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
   <header class="mast">
     <span class="en">Bridge Health Atlas of Japan</span>
     <h1>全国の橋 健全度マップ</h1>
-    <p>国の「全国道路施設点検データベース」に載っている道路橋を全部、地図に落としました。色は点検の判定区分（Ⅰ健全〜Ⅳ緊急措置）か、かけられてからの年数。条件を選ぶと、たとえば「築50年以上で判定Ⅲ」の橋だけが残ります。</p>
+    <p>日本の道路の橋は約73万。その全てが5年に1回「健康診断」を受けています。国のデータベースにあるその結果を全部、地図に落としました。色は診断の結果（健全度）か、橋ができてからの年数。自分の町を選ぶと、普段渡っている橋が今どんな状態かが分かります。</p>
     <div class="stats" id="stats"></div>
+    <p class="src">データ：国土交通省 <a href="https://road-structures-db.mlit.go.jp/" target="_blank" rel="noopener">xROAD 全国道路施設点検データベース</a> ・ <a href="https://road-structures-map.mlit.go.jp/" target="_blank" rel="noopener">xROAD の地図で見る</a></p>
+    <button type="button" class="jump" data-to="words">初めての人は「用語の説明」から読んでください ↓</button>
+    <button type="button" class="jump" data-to="citizen">市民が日常的に橋を見守るには ↓</button>
   </header>
 
   <section class="sec">
@@ -155,8 +177,10 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
       <div class="frow" id="f-k"><span class="lab">管理者</span></div>
       <div class="frow" id="f-l"><span class="lab">橋の長さ</span></div>
       <div class="frow"><span class="lab">都道府県</span><select id="pref" aria-label="都道府県"></select>
-        <button class="reset" id="reset" type="button">条件をはずす</button>
+        <select id="city" aria-label="市区町村" disabled><option value="">市区町村（県を選ぶと出ます）</option></select>
+        <button class="reset" id="reset" type="button">条件を外す</button>
         <span class="count" id="count"></span></div>
+      <div class="frow"><span class="lab">橋を探す</span><input type="search" id="q" placeholder="橋の名前・道路の名前（県を選ぶと使えます）" aria-label="橋の名前で探す" disabled></div>
     </div>
   </section>
 
@@ -168,28 +192,28 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
         <div class="ctrl"><button type="button" id="zin" aria-label="拡大">＋</button><button type="button" id="zout" aria-label="縮小">−</button><button type="button" class="txt" id="zall">全国</button></div>
         <div class="legend" id="legend"></div>
         <div class="hint">ドラッグで移動・ホイールやピンチで拡大・点をタップで詳しく</div>
-        <div class="loading" id="loading">橋のデータを読みこみ中…</div>
+        <div class="loading" id="loading">橋のデータを読み込み中…</div>
       </div>
       <div class="side">
-        <div class="card" id="info"><h3>えらんだ橋</h3><p class="empty">地図の点をタップすると、橋の名前・かけた年・点検の結果が出ます。</p></div>
+        <div class="card" id="info"><h3>選んだ橋</h3><p class="empty">地図の点をタップすると、橋の名前・架設年・点検の結果が出ます。</p></div>
         <div class="card"><h3>年数 × 判定区分</h3>
           <div class="wrapx"><table class="matrix" id="matrix"></table></div>
-          <p class="note">いまの条件（判定区分と年数をのぞく）にあてはまる橋の数。マスを押すとその組み合わせだけを地図に出します。</p>
+          <p class="note">今の条件（判定区分と年数を除く）に当てはまる橋の数。マスを押すとその組み合わせだけを地図に出します。</p>
         </div>
       </div>
     </div>
   </section>
 
   <section class="sec">
-    <h2 class="h2">かけられた年と判定区分<small id="hist-sub"></small></h2>
+    <h2 class="h2">架設年と判定区分<small id="hist-sub"></small></h2>
     <div class="hist" id="hist"></div>
-    <p class="note">高度経済成長期（1955〜1973年ごろ）にかけた橋が山になっていて、そこに判定Ⅲの赤が多く重なります。</p>
+    <p class="note">高度経済成長期（1955〜1973年ごろ）に架設した橋が山になっていて、そこに判定Ⅲの赤が多く重なります。</p>
   </section>
 
   <section class="sec">
     <div class="twocol">
       <div>
-        <h2 class="h2">都道府県くらべ<small>行を押すとその県へ。割合は判定区分・年数の条件をはずして計算</small></h2>
+        <h2 class="h2">都道府県別の比較<small>行を押すとその県へ。割合は判定区分・年数の条件を外して計算</small></h2>
         <div class="scroll"><table class="tbl" id="ptable"></table></div>
       </div>
       <div>
@@ -199,8 +223,76 @@ select{border:1px solid var(--hair);background:var(--paper);padding:4px 8px;bord
     </div>
   </section>
 
+  <section class="sec" id="words">
+    <h2 class="h2">用語の説明<small>初めて見る人向け</small></h2>
+    <dl class="words">
+      <div class="word"><dt>道路橋</dt><dd>道路が川・谷・線路・他の道路をまたぐための橋。長さ2m以上の橋は全て点検の対象で、全国に約73万あります。小さな川にかかる数mの橋が最も多く、大きな橋はごく一部です。</dd></div>
+      <div class="word"><dt>定期点検</dt><dd>橋の健康診断。2012年に中央自動車道の笹子トンネルで天井の板が落ちる事故があり、9人が亡くなりました。これを契機に、2014年から全ての道路橋を「5年に1回、近くまで行って目で見て」点検することが法律で決まりました。</dd></div>
+      <div class="word"><dt>健全度・判定区分</dt><dd>点検した技術者が、橋の状態を4段階で判定したもの。このマップの色分けの元になっています。病院の診断に例えると、次のようになります。
+        <ul class="lv">
+          <li><span class="badge" style="--c:var(--h1)">Ⅰ 健全</span><span><b>異常なし。</b>橋の働きに問題はありません。</span></li>
+          <li><span class="badge lt" style="--c:var(--h2)">Ⅱ 予防保全</span><span><b>経過観察。</b>今は問題ないけれど、早めに手当てすると長持ちします。</span></li>
+          <li><span class="badge" style="--c:var(--h3)">Ⅲ 早期措置</span><span><b>治療が必要。</b>このままだと問題が出る恐れがあり、次の点検（5年以内）までに直すべき状態です。</span></li>
+          <li><span class="badge" style="--c:var(--h4)">Ⅳ 緊急措置</span><span><b>すぐに対応。</b>問題が出ている、または出る可能性がとても高い状態。通行止めにして直すか、架け替え・撤去を考えます。</span></li>
+        </ul></dd></div>
+      <div class="word"><dt>措置</dt><dd>点検で見つかった傷みへの対応のこと。ひび割れを塞ぐ・さびた部分を塗り直すといった修繕、弱った部分を強くする補強、通行止めや重い車の制限、架け替え、撤去などがあります。</dd></div>
+      <div class="word"><dt>予防保全</dt><dd>壊れる前に小さく直して長持ちさせる考え方。虫歯が小さいうちに治すほうが、抜いて入れ歯にするより安くて体にもいいのと同じです。反対に、壊れてから直すことを「事後保全」といいます。</dd></div>
+      <div class="word"><dt>架設年度・築年数</dt><dd>架設年度は橋ができた年度。そこから何年たったかが築年数（このマップでは2026年から計算）です。国は「建設から50年」を、インフラの高齢化を見る一つの目安にしています。架設年の記録が残っていない橋は「不明」にしています。</dd></div>
+      <div class="word"><dt>管理者</dt><dd>その橋の持ち主で、点検や修理に責任を持つところ。国道は国や都道府県、県道は都道府県、市町村道は市区町村、高速道路は高速道路会社が管理します。全国の橋の約7割は市区町村の管理です。</dd></div>
+      <div class="word"><dt>高度経済成長期</dt><dd>1955〜1973年ごろ、日本の経済が急に大きくなった時期。道路や橋が一斉に造られ、年数の分かる橋の約3割がこの時期の生まれです。この橋たちが今、50〜70歳になっています。</dd></div>
+      <div class="word"><dt>橋長・幅員</dt><dd>橋長は橋の長さ、幅員は橋の幅のこと。地図の点を押すと出てきます。</dd></div>
+    </dl>
+  </section>
+
+  <section class="sec" id="know">
+    <h2 class="h2">マップを見る前に知っておきたいこと</h2>
+    <dl class="words">
+      <div class="word"><dt>地図の見方</dt><dd>点1つが橋1つです。色は「健全度で色分け」と「年数で色分け」で切り替えられます。全国では点が重なって見えるので、拡大するか、上の条件で絞ってください。悪い判定・古い橋ほど上に描いているので、目立ちやすくなっています。</dd></div>
+      <div class="word"><dt>判定Ⅳがとても少ない理由</dt><dd>判定Ⅳ（緊急措置）の橋は全国で約600と、全体の0.1%もありません。Ⅳと判定されると、すぐに通行止めにして直すか、架け替え・撤去をするからです。今の数は「すでに対応を始めている橋」と考えてください。</dd></div>
+      <div class="word"><dt>判定Ⅲは「すぐ落ちる」ではない</dt><dd>判定Ⅲは「このままだと問題が出る恐れがあるので、5年以内に直すべき」という意味です。今すぐ危ないという意味ではありません。ただ、直すのが追いついていない自治体もあり、その間に傷みが進むことがあります。</dd></div>
+      <div class="word"><dt>橋の高齢化</dt><dd>年数の分かる橋のうち、今は44%が築50年以上です。20年後には8割を超えます（このマップのデータで計算）。高度経済成長期に一斉に造った橋が、これから一斉に年を取っていきます。</dd></div>
+      <div class="word"><dt>誰が守っているか</dt><dd>全国の橋の約7割は市区町村が管理しています。小さな町では、橋に詳しい技術者がいなかったり、直すお金が足りなかったりして、点検や修理が大きな負担になっています。使う人が少ない橋は、直さずにまとめたり撤去したりすることもあります。</dd></div>
+      <div class="word"><dt>橋がなくなると</dt><dd>橋は洪水で流されたり、古くなって通れなくなったりすることがあります。通れなくなると、遠回りが必要になるだけでなく、救急車や消防車が遅れたり、災害のときに避難や物資の運搬ができなくなったりします。新しく架けるには、計画・設計・土地の調整・工事が必要で、小さな橋でも数年、大きな橋では10年以上かかることもあります。</dd></div>
+      <div class="word"><dt>市民にできること</dt><dd>5年に1回の点検の間にも、橋は毎日使われ、傷んでいきます。その間を埋めるのが、橋を毎日渡っている市民の目です。具体的な見方は下の「市民が日常的に橋を見守る」にまとめました。</dd></div>
+    </dl>
+  </section>
+
+  <section class="sec" id="citizen">
+    <h2 class="h2">市民が日常的に橋を見守る<small>このマップが目指すこと</small></h2>
+    <p class="lead">法律で決まった定期点検は5年に1回、専門の技術者が行います。しかし市区町村には技術者もお金も足りず、5年の間に起きる変化には気づきにくいのが現状です。橋を毎日渡っている市民が、日常的に橋の様子を見て記録し、管理者に伝える。これが当たり前になれば、傷みを早く見つけて小さく直す「予防保全」が進みます。</p>
+    <dl class="words">
+      <div class="word"><dt>どこを見るか</dt><dd>
+        <ul class="chk">
+          <li>コンクリートのひび割れ、表面の剥がれ、中の鉄筋が見えていないか</li>
+          <li>鉄の部分のさび、塗装の剥がれ、穴</li>
+          <li>手すりや柵のぐらつき・曲がり・欠け</li>
+          <li>路面の段差、穴、継ぎ目（伸縮装置）のがたつきや異音</li>
+          <li>排水口の詰まり、雨の後の水たまり</li>
+          <li>橋の下側や橋台のまわりの、川の水による削れ・土砂の崩れ</li>
+        </ul></dd></div>
+      <div class="word"><dt>どう記録するか</dt><dd>気になる所を見つけたら、<b>写真</b>を撮り、<b>日付</b>と<b>場所</b>（橋の名前、どちら側か）を残します。橋の名前は「橋名板」か、このマップで橋の点を押すと分かります。同じ場所を時間をおいて撮り比べると、傷みが進んでいるかどうかが分かります。</dd></div>
+      <div class="word"><dt>どう伝えるか</dt><dd>記録は、その橋の<b>管理者</b>に伝えます（このマップで点を押すと管理者が出ます）。市区町村の道路の担当課のほか、国道などの異常は「道路緊急ダイヤル #9910」で受け付けています。ただし、穴が開いている・大きく傾いているなど危険な状態のときは、近づかずにすぐ連絡してください。</dd></div>
+      <div class="word"><dt>注意すること</dt><dd>橋の下や川の中、車道に入っての確認はしないでください。市民の見守りは、正式な定期点検（判定区分を付けること）の代わりではなく、それを補うものです。見つけたことをもとに、管理者が詳しく調べて判断します。</dd></div>
+    </dl>
+  </section>
+
+  <section class="sec" id="others">
+    <h2 class="h2">橋の他にもある土木構造物<small>暮らしと防災を支える施設</small></h2>
+    <p class="lead">土木構造物とは、道路・川・港・水道など、多くの人が使う施設を形作る構造物のことです。橋はその一つにすぎません。xROAD には橋の他に、道路のトンネル（11,668本）、シェッド（3,629か所）、大型カルバート（9,886か所）の点検結果も載っていて、これらも5年に1回点検されています（件数は xROAD API より、2026年11月時点）。</p>
+    <dl class="words">
+      <div class="word"><dt>道路を支える</dt><dd><b>トンネル・シェッド・大型カルバート・横断歩道橋・擁壁</b>。シェッドは落石や雪崩から道路を守る屋根、大型カルバートは道路の下をくぐる箱形の通路や水路です。災害のときに救援物資を運ぶ「緊急輸送道路」を通れる状態に保つことが特に大切です。<br><span class="who">管理：国・都道府県・市区町村・高速道路会社</span></dd></div>
+      <div class="word"><dt>川の氾濫を防ぐ</dt><dd><b>堤防・水門・樋門・排水機場・遊水地・地下の調節池</b>。大雨のとき、川の水が溢れたり、街に溜まった水が抜けなくなったりするのを防ぎます。首都圏外郭放水路のような巨大な地下施設もあります。<br><span class="who">管理：国（大きな川）・都道府県</span></dd></div>
+      <div class="word"><dt>土砂災害を防ぐ</dt><dd><b>砂防堰堤・地すべり防止施設・急傾斜地の擁壁</b>。山から流れ出る土石流を受け止めたり、崖崩れを防いだりします。日本は山が多く、土砂災害の危険がある場所が全国にあります。<br><span class="who">管理：国・都道府県</span></dd></div>
+      <div class="word"><dt>水をためて使う</dt><dd><b>ダム・ため池・用水路</b>。洪水を一時的にためて下流を守る、飲み水や農業用水・発電に使う、という役割があります。古いため池が大雨で決壊する被害も起きています。<br><span class="who">管理：国・都道府県・水資源機構・電力会社・農家の団体など</span></dd></div>
+      <div class="word"><dt>海から守る・海とつなぐ</dt><dd><b>防波堤・防潮堤・海岸堤防・岸壁</b>。高潮や津波から街を守り、船が安全に荷物を積み下ろしできるようにします。災害のときは海からの物資輸送の拠点にもなります。<br><span class="who">管理：国・都道府県・市町村</span></dd></div>
+      <div class="word"><dt>水を届ける・きれいにする</dt><dd><b>浄水場・水道管・下水道管・下水処理場</b>。地下にあって普段は見えませんが、古くなると水道管の破裂や道路の陥没につながります。2025年には埼玉県八潮市で、下水道管の破損による大きな道路陥没事故が起きました。<br><span class="who">管理：主に市区町村・都道府県</span></dd></div>
+      <div class="word"><dt>人と物を運ぶ</dt><dd><b>線路・鉄道の橋とトンネル・駅・空港の滑走路</b>。鉄道の橋やトンネルも、鉄道会社が定期的に検査しています。<br><span class="who">管理：鉄道会社・国・空港会社など</span></dd></div>
+    </dl>
+    <p class="note">どの構造物にも、それを造った人と、今も点検して守っている人がいます。身近な場所で、川の堤防や水門、道路のトンネルを探してみてください。</p>
+  </section>
+
   <section class="sec foot">
-    <p>出典：国土交通省「全国道路施設点検データベース（xROAD）」の橋梁データ（API 取得 <span id="upd"></span>）。判定区分は道路橋の定期点検（5年に1回）の結果で、Ⅰ健全・Ⅱ予防保全段階・Ⅲ早期措置段階・Ⅳ緊急措置段階。「判定なし」はデータベースに判定が入っていない橋です。年数は架設年度から数えた目安で、架設年度が分からない橋は「不明」にしています。地図の点は管理者が登録した位置で、ずれていることがあります。</p>
+    <p>出典：国土交通省「<a href="https://road-structures-db.mlit.go.jp/" target="_blank" rel="noopener">全国道路施設点検データベース（xROAD）</a>」の橋梁データ（API 取得 <span id="upd"></span>）。判定区分は道路橋の定期点検（5年に1回）の結果で、Ⅰ健全・Ⅱ予防保全段階・Ⅲ早期措置段階・Ⅳ緊急措置段階。「判定なし」はデータベースに判定が入っていない橋です。年数は架設年度から数えた目安で、架設年度が分からない橋は「不明」にしています。地図の点は管理者が登録した位置で、ずれていることがあります。</p>
     <p>点検の結果は橋の管理者（国・都道府県・市区町村・高速道路会社など）が出したものです。このページは見て楽しむためのもので、通行してよいかどうかの判断には使えません。</p>
   </section>
 </div>
@@ -213,8 +305,9 @@ const H=[{k:1,t:"Ⅰ 健全",s:"Ⅰ"},{k:2,t:"Ⅱ 予防保全",s:"Ⅱ"},{k:3,t:
 const HL={1:"Ⅰ 健全",2:"Ⅱ 予防保全段階",3:"Ⅲ 早期措置段階",4:"Ⅳ 緊急措置段階",0:"判定なし"};
 const A=[{k:0,t:"30年未満",lo:0,hi:29},{k:1,t:"30〜49年",lo:30,hi:49},{k:2,t:"50〜69年",lo:50,hi:69},{k:3,t:"70〜99年",lo:70,hi:99},{k:4,t:"100年以上",lo:100,hi:9999},{k:5,t:"不明"}];
 const K=[{k:1,t:"国"},{k:2,t:"都道府県"},{k:4,t:"政令市"},{k:5,t:"市区町村"},{k:6,t:"高速道路会社"},{k:3,t:"道路公社"}];
+const MEAN={1:"異常なし。橋の働きに問題はありません。",2:"今は問題ないけれど、早めに手当てすると長持ちする状態。",3:"このままだと問題が出る恐れがあり、5年以内に直すべき状態。",4:"問題が出ている、または出る恐れがとても高く、すぐに対応が必要な状態。",0:"データベースに判定が入っていません。"};
 const KL={1:"国",2:"都道府県",3:"道路公社",4:"政令市",5:"市区町村",6:"高速道路会社"};
-const L=[{k:0,t:"ぜんぶ",m:0},{k:1,t:"15m以上",m:150},{k:2,t:"100m以上",m:1000},{k:3,t:"500m以上",m:5000}];
+const L=[{k:0,t:"全部",m:0},{k:1,t:"15m以上",m:150},{k:2,t:"100m以上",m:1000},{k:3,t:"500m以上",m:5000}];
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmt=n=>n.toLocaleString("ja-JP");
@@ -235,23 +328,45 @@ async function load(){
   AB=new Uint8Array(N);PF=new Uint8Array(N);
   for(let i=0;i<N;i++)AB[i]=ageBin(YR[i]);
   for(const [p,s,e] of m.prefs)PF.fill(p,s,e);
-  const idx=[...Array(N).keys()];// 判定なし(0)・不明をいちばん下に
+  const idx=[...Array(N).keys()];// 判定なし(0)・不明を最も下に
   orderH=Uint32Array.from(idx.sort((a,b)=>((HT[a]?HT[a]:-1)-(HT[b]?HT[b]:-1))));
   orderA=Uint32Array.from([...Array(N).keys()].sort((a,b)=>((AB[a]===5?-1:AB[a])-(AB[b]===5?-1:AB[b]))));
-  pass=new Uint8Array(N);
+  pass=new Uint8Array(N);AREA=new Uint8Array(N);
 }
-function detail(p){if(!DET[p])DET[p]=fetch(`data/d/${String(p).padStart(2,"0")}.json`).then(r=>r.json());return DET[p]}
+const DETD={};             // 読み終わった県の詳細
+function detail(p){if(!DET[p])DET[p]=fetch(`data/d/${String(p).padStart(2,"0")}.json`).then(r=>r.json()).then(j=>{DETD[p]=j;return j});return DET[p]}
+function pstart(p){return META.prefs.find(r=>r[0]===p)[1]}
+// 市区町村・名前で探す: AREA[i]=1 の橋だけ残す
+let AREA=null;
+function computeArea(){
+  st.area=false;const d=DETD[st.pref];if(!st.pref||!d||(!st.city&&!st.q))return;
+  const q=st.q.trim().toLowerCase(),ci=st.city?d.c.indexOf(st.city):-1,s0=pstart(st.pref);
+  AREA.fill(0);
+  d.r.forEach((r,j)=>{if(st.city&&r[1]!==ci)return;if(q&&!((r[0]||"")+" "+(r[3]||"")).toLowerCase().includes(q))return;AREA[s0+j]=1});
+  st.area=true;
+}
+function areaOk(i){return !st.area||AREA[i]}
+function zoomArea(){if(!st.area)return;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,c=0;for(let i=0;i<N;i++){if(!AREA[i])continue;c++;const x=X[i]/META.sx,y=Y[i]/META.sx-META.oy;x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}
+  if(!c)return;const m=Math.max(1.5,(x1-x0)*.08,(y1-y0)*.08);animateTo(fit([x0-m,y0-m,x1+m,y1+m],20))}
+async function loadPlace(p){
+  const cs=$("#city"),q=$("#q");st.city="";st.q="";q.value="";
+  cs.innerHTML=`<option value="">${p?"市区町村（全部）":"市区町村（県を選ぶと出ます）"}</option>`;cs.disabled=q.disabled=!p;
+  q.placeholder=p?"橋の名前・道路の名前（例：大橋）":"橋の名前・道路の名前（県を選ぶと使えます）";
+  if(!p)return;const d=await detail(p);if(st.pref!==p)return;
+  const n=new Array(d.c.length).fill(0);for(const r of d.r)n[r[1]]++;
+  cs.innerHTML=`<option value="">市区町村（全部）</option>`+d.c.map((c,i)=>[c,n[i]]).filter(x=>x[0]).sort((a,b)=>a[0].localeCompare(b[0],"ja")).map(([c,k])=>`<option value="${esc(c)}">${esc(c)}（${fmt(k)}）</option>`).join("");
+}
 
 // ---------- 絞り込み ----------
 function kOf(i){const k=KB[i];return KL[k]?k:0}
 function compute(){
   const mL=L[st.l].m;
   for(let i=0;i<N;i++){
-    pass[i]=(!st.h.size||st.h.has(HT[i]))&&(!st.a.size||st.a.has(AB[i]))&&(!st.k.size||st.k.has(kOf(i)))&&LN[i]>=mL&&(!st.pref||PF[i]===st.pref)?1:0;
+    pass[i]=(!st.h.size||st.h.has(HT[i]))&&(!st.a.size||st.a.has(AB[i]))&&(!st.k.size||st.k.has(kOf(i)))&&LN[i]>=mL&&(!st.pref||PF[i]===st.pref)&&areaOk(i)?1:0;
   }
 }
 // 判定区分と年数をのぞいた条件での 年数×判定 の表
-function base(i){return (!st.k.size||st.k.has(kOf(i)))&&LN[i]>=L[st.l].m&&(!st.pref||PF[i]===st.pref)}
+function base(i){return (!st.k.size||st.k.has(kOf(i)))&&LN[i]>=L[st.l].m&&(!st.pref||PF[i]===st.pref)&&areaOk(i)}
 
 // ---------- 色 ----------
 let CH={},CA={};
@@ -325,27 +440,28 @@ function pick(sx,sy){
   select(best,false);
 }
 
-// ---------- えらんだ橋 ----------
+// ---------- 選んだ橋 ----------
 async function select(i,center){
   st.sel=i;req();
   const box=$("#info");
-  if(i<0){box.innerHTML=`<h3>えらんだ橋</h3><p class="empty">地図の点をタップすると、橋の名前・かけた年・点検の結果が出ます。</p>`;markList();return}
+  if(i<0){box.innerHTML=`<h3>選んだ橋</h3><p class="empty">地図の点をタップすると、橋の名前・架設年・点検の結果が出ます。</p>`;markList();return}
   if(center){const k=Math.max(view.k,k0*40);animateTo({k,tx:W/2-X[i]/META.sx*k,ty:Hh/2-(Y[i]/META.sx-META.oy)*k})}
   const p=PF[i],start=META.prefs.find(r=>r[0]===p)[1];
-  box.innerHTML=`<h3>えらんだ橋</h3><p class="empty">読みこみ中…</p>`;
+  box.innerHTML=`<h3>選んだ橋</h3><p class="empty">読み込み中…</p>`;
   const d=await detail(p);if(st.sel!==i)return;
   const [nm,ci,mi,ro,wd,tn,lat,lon]=d.r[i-start];
   const y=YR[i],age=y?NOW-y:null,h=HT[i];
-  box.innerHTML=`<h3>えらんだ橋</h3>
+  box.innerHTML=`<h3>選んだ橋</h3>
    <p class="bname">${esc(nm||"（名前なし）")}</p>
    <p class="bsub">${esc(PREF[p])} ${esc(d.c[ci])}${ro?" ・ "+esc(ro):""}</p>
    <dl class="kv">
     <dt>判定区分</dt><dd><span class="badge${h===2?" lt":""}" style="--c:${hvar(h)}">${HL[h]}</span>${tn?` <small>（${tn}年度の点検）</small>`:""}</dd>
-    <dt>かけた年</dt><dd>${y?`${y}年度（築およそ${age}年）`:"不明"}</dd>
+    <dt></dt><dd class="mean">${MEAN[h]}</dd>
+    <dt>架設年</dt><dd>${y?`${y}年度（築約${age}年）`:"不明"}</dd>
     <dt>橋の長さ</dt><dd>${LN[i]?(LN[i]/10).toLocaleString("ja-JP")+" m":"—"}${wd?` ・ 幅 ${wd} m`:""}</dd>
     <dt>管理者</dt><dd>${esc(d.m[mi])}（${KL[KB[i]]||"その他"}）</dd>
    </dl>
-   <p style="margin:8px 0 0"><a class="ext" href="https://maps.gsi.go.jp/#17/${lat}/${lon}/" target="_blank" rel="noopener">地理院地図で見る</a> ・ <a class="ext" href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" rel="noopener">Googleマップ</a></p>`;
+   <p style="margin:8px 0 0"><a class="ext" href="https://maps.gsi.go.jp/#17/${lat}/${lon}/" target="_blank" rel="noopener">地理院地図で見る</a> ・ <a class="ext" href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" rel="noopener">Googleマップ</a><br><a class="ext" href="https://road-structures-map.mlit.go.jp/" target="_blank" rel="noopener">xROAD の地図で調べる</a> ・ <a class="ext" href="https://road-structures-db.mlit.go.jp/" target="_blank" rel="noopener">xROAD データベース</a></p>`;
   markList();
 }
 
@@ -353,7 +469,7 @@ async function select(i,center){
 function chipRow(sel,items,set,cvar){
   const row=$(sel);row.querySelectorAll(".chip").forEach(b=>b.remove());
   for(const it of items){const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.k=it.k;
-    b.innerHTML=`${cvar?`<i style="--c:${cvar(it.k)}"></i>`:""}${it.t}<span class="n"></span>`;
+    if(cvar===hvar)b.title=MEAN[it.k];b.innerHTML=`${cvar?`<i style="--c:${cvar(it.k)}"></i>`:""}${it.t}<span class="n"></span>`;
     b.onclick=()=>{set.has(it.k)?set.delete(it.k):set.add(it.k);update()};row.appendChild(b)}
 }
 function lenRow(){const row=$("#f-l");for(const it of L){const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.k=it.k;b.textContent=it.t;b.onclick=()=>{st.l=it.k;update()};row.appendChild(b)}}
@@ -366,7 +482,7 @@ const PRESETS=[
 ];
 function presets(){const el=$("#presets");PRESETS.forEach(p=>{const b=document.createElement("button");b.type="button";b.className="preset";b.textContent=p.t;b.onclick=()=>{p.f();update()};el.appendChild(b)})}
 function prefSelect(){const s=$("#pref");s.innerHTML=`<option value="0">全国</option>`+PREF.slice(1).map((n,i)=>`<option value="${i+1}">${n}</option>`).join("");s.onchange=()=>setPref(+s.value)}
-function setPref(p){st.pref=p;$("#pref").value=p;st.listN=50;update();animateTo(p?fit(GEO.bb[p],20):fit(FULL,8));try{history.replaceState(null,"",p?"#p"+p:location.pathname+location.search)}catch(e){}}
+function setPref(p){st.pref=p;$("#pref").value=p;st.listN=50;st.area=false;loadPlace(p);update();animateTo(p?fit(GEO.bb[p],20):fit(FULL,8));try{history.replaceState(null,"",p?"#p"+p:location.pathname+location.search)}catch(e){}}
 
 // ---------- 集計して描く ----------
 function update(){
@@ -377,7 +493,7 @@ function update(){
   // ボタンの状態と数（他の条件をそのままにしたときの数）
   const cntH=new Map(),cntA=new Map(),cntK=new Map();
   const mL=L[st.l].m;
-  for(let i=0;i<N;i++){if(LN[i]<mL||(st.pref&&PF[i]!==st.pref))continue;const h=HT[i],a=AB[i],k=kOf(i);
+  for(let i=0;i<N;i++){if(LN[i]<mL||(st.pref&&PF[i]!==st.pref)||!areaOk(i))continue;const h=HT[i],a=AB[i],k=kOf(i);
     const okH=!st.h.size||st.h.has(h),okA=!st.a.size||st.a.has(a),okK=!st.k.size||st.k.has(k);
     if(okA&&okK)cntH.set(h,(cntH.get(h)||0)+1);if(okH&&okK)cntA.set(a,(cntA.get(a)||0)+1);if(okH&&okA)cntK.set(k,(cntK.get(k)||0)+1)}
   const paint=(sel,set,cnt)=>$(sel).querySelectorAll(".chip").forEach(b=>{const k=+b.dataset.k;b.setAttribute("aria-pressed",set.has(k));const c=cnt.get(k)||0;b.querySelector(".n").textContent=fmt(c);b.classList.toggle("off",!c)});
@@ -387,7 +503,7 @@ function update(){
   req();renderMatrix();renderHist();renderPrefs();renderList();renderLegend();
 }
 function renderLegend(){
-  const items=st.color==="h"?H.map(h=>`<span><i style="--c:${hvar(h.k)}"></i>${h.t}</span>`):A.map(a=>`<span><i style="--c:${avar(a.k)}"></i>${a.k===5?"かけた年が不明":"築"+a.t}</span>`);
+  const items=st.color==="h"?H.map(h=>`<span><i style="--c:${hvar(h.k)}"></i>${h.t}</span>`):A.map(a=>`<span><i style="--c:${avar(a.k)}"></i>${a.k===5?"架設年が不明":"築"+a.t}</span>`);
   $("#legend").innerHTML=items.join("");
 }
 function renderMatrix(){
@@ -415,14 +531,14 @@ function renderHist(){
   let r="";bins.forEach((row,bi)=>{let y=Ht-mb;for(const h of [1,2,3,4,0]){const v=row[h];if(!v)continue;const hh=v/mx*(Ht-mb-mt);y-=hh;r+=`<rect x="${(ml+bi*bw+0.5).toFixed(1)}" y="${y.toFixed(1)}" width="${(bw-1).toFixed(1)}" height="${hh.toFixed(1)}" fill="${hvar(h)}"><title>${bi?`${B0+(bi-1)*BW}〜${B0+(bi-1)*BW+4}年`:"1899年以前"} ${HL[h]} ${fmt(v)}橋</title></rect>`}});
   let x="";for(let yv=1900;yv<=2020;yv+=20){const bi=1+(yv-B0)/BW;x+=`<text x="${ml+bi*bw}" y="${Ht-6}" text-anchor="middle">${yv}</text>`}
   x+=`<text x="${ml+bw/2}" y="${Ht-6}" text-anchor="middle">前</text>`;
-  $("#hist").innerHTML=`<div class="wrapx"><svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="かけられた年ごとの橋の数（判定区分で色分け）" style="min-width:560px">${g}${r}${x}</svg></div>`;
-  $("#hist-sub").textContent=`いまの条件で ${fmt(tot.reduce((a,b)=>a+b,0))}橋（かけた年が不明の ${fmt(unk)}橋はのぞく）`;
+  $("#hist").innerHTML=`<div class="wrapx"><svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="架設年ごとの橋の数（判定区分で色分け）" style="min-width:560px">${g}${r}${x}</svg></div>`;
+  $("#hist-sub").textContent=`今の条件で ${fmt(tot.reduce((a,b)=>a+b,0))}橋（架設年が不明の ${fmt(unk)}橋は除く）`;
 }
 let psort={k:"r34",d:-1};
 function renderPrefs(){
   // 都道府県ごと: 条件に合う数、そのうち判定Ⅲ・Ⅳの割合、築50年以上の割合
   const n=new Array(48).fill(0),c34=new Array(48).fill(0),h=new Array(48).fill(0),o50=new Array(48).fill(0),yk=new Array(48).fill(0);
-  // 割合は その列の条件（判定区分／年数）だけをはずして数える。そうしないと「判定Ⅲだけ」のとき100%になる
+  // 割合は その列の条件（判定区分／年数）だけを外して数える。そうしないと「判定Ⅲだけ」のとき100%になる
   const mL=L[st.l].m;
   for(let i=0;i<N;i++){if(LN[i]<mL||(st.k.size&&!st.k.has(kOf(i))))continue;const p=PF[i];
     const okH=!st.h.size||st.h.has(HT[i]),okA=!st.a.size||st.a.has(AB[i]);
@@ -445,22 +561,22 @@ async function renderList(){
   if(!st.pref){
     // 全国では 長い順に上位だけ（名前は県ごとに読む）
     let idx=[];for(let i=0;i<N;i++)if(pass[i])idx.push(i);
-    $("#list-sub").textContent=idx.length>st.listN?`いまの条件の ${fmt(idx.length)}橋のうち、判定が悪く古い順に ${st.listN}橋`:`いまの条件の ${fmt(idx.length)}橋`;
+    $("#list-sub").textContent=idx.length>st.listN?`今の条件の ${fmt(idx.length)}橋のうち、判定が悪く古い順に ${st.listN}橋`:`今の条件の ${fmt(idx.length)}橋`;
     idx.sort((a,b)=>(HT[b]||0)-(HT[a]||0)||(YR[a]||9999)-(YR[b]||9999)||LN[b]-LN[a]);idx=idx.slice(0,st.listN);
     const need=[...new Set(idx.map(i=>PF[i]))];
-    if(need.length>6){el.innerHTML=`<p class="note">全国から ${fmt(idx.length)}橋を出すと読みこみが重くなるので、都道府県を選ぶか、条件をしぼってください。</p>`;return}
-    el.innerHTML=`<p class="note">読みこみ中…</p>`;await Promise.all(need.map(detail));if(tok!==listToken)return;return listTable(el,idx);
+    if(need.length>6){el.innerHTML=`<p class="note">全国から ${fmt(idx.length)}橋を出すと読み込みが重くなるので、都道府県を選ぶか、条件を絞ってください。</p>`;return}
+    el.innerHTML=`<p class="note">読み込み中…</p>`;await Promise.all(need.map(detail));if(tok!==listToken)return;return listTable(el,idx);
   }
   let idx=[];for(let i=0;i<N;i++)if(pass[i])idx.push(i);
-  $("#list-sub").textContent=`${PREF[st.pref]}・いまの条件で ${fmt(idx.length)}橋（判定が悪く古い順）`;
+  $("#list-sub").textContent=`${PREF[st.pref]}${st.city?" "+st.city:""}${st.q?"「"+st.q+"」":""}・今の条件で ${fmt(idx.length)}橋（判定が悪く古い順）`;
   idx.sort((a,b)=>(HT[b]||0)-(HT[a]||0)||(YR[a]||9999)-(YR[b]||9999)||LN[b]-LN[a]);
-  el.innerHTML=`<p class="note">読みこみ中…</p>`;await detail(st.pref);if(tok!==listToken)return;
+  el.innerHTML=`<p class="note">読み込み中…</p>`;await detail(st.pref);if(tok!==listToken)return;
   listTable(el,idx.slice(0,st.listN),idx.length);
 }
 async function listTable(el,idx,total){
   const ds={};for(const i of idx){const p=PF[i];ds[p]=ds[p]||await detail(p)}
   const st0=Object.fromEntries(META.prefs.map(r=>[r[0],r[1]]));
-  el.innerHTML=idx.length?`<div class="scroll"><table class="tbl"><thead><tr><th>橋</th><th>場所</th><th class="num">かけた年</th><th class="num">長さ</th><th>判定</th></tr></thead><tbody>`+
+  el.innerHTML=idx.length?`<div class="scroll"><table class="tbl"><thead><tr><th>橋</th><th>場所</th><th class="num">架設年</th><th class="num">長さ</th><th>判定</th></tr></thead><tbody>`+
    idx.map(i=>{const d=ds[PF[i]],r=d.r[i-st0[PF[i]]];return `<tr data-i="${i}" class="${st.sel===i?"sel":""}"><td>${esc(r[0]||"（名前なし）")}</td><td>${esc(st.pref?d.c[r[1]]:PREF[PF[i]]+" "+d.c[r[1]])}</td><td class="num">${YR[i]||"不明"}</td><td class="num">${LN[i]?(LN[i]/10).toFixed(0)+"m":"—"}</td><td><span class="dot" style="--c:${hvar(HT[i])}"></span>${H.find(x=>x.k===HT[i]).s}</td></tr>`}).join("")+`</tbody></table></div>`+
    (total>idx.length?`<button type="button" class="more" id="more">あと${fmt(Math.min(200,total-idx.length))}橋を出す</button>`:""):`<p class="note">条件に合う橋はありません。</p>`;
   el.querySelectorAll("tbody tr").forEach(t=>t.onclick=()=>select(+t.dataset.i,true));
@@ -476,6 +592,9 @@ function renderStats(){
 
 // ---------- はじめ ----------
 document.querySelectorAll(".colorby button").forEach(b=>b.onclick=()=>{st.color=b.dataset.c;document.querySelectorAll(".colorby button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderLegend();req()});
+$("#city").onchange=e=>{st.city=e.target.value;st.listN=50;computeArea();update();if(st.area)zoomArea();else animateTo(fit(GEO.bb[st.pref],20))};
+let qT=0;$("#q").oninput=e=>{clearTimeout(qT);qT=setTimeout(()=>{st.q=e.target.value;st.listN=50;computeArea();update();if(st.area){let c=0;for(let i=0;i<N&&c<=300;i++)c+=AREA[i];if(c&&c<=300)zoomArea()}},250)};
+document.querySelectorAll(".jump").forEach(b=>b.onclick=()=>document.getElementById(b.dataset.to).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"}));
 $("#reset").onclick=()=>{st.h.clear();st.a.clear();st.k.clear();st.l=0;update()};
 chipRow("#f-h",H,st.h,hvar);chipRow("#f-a",A,st.a,avar);chipRow("#f-k",K,st.k,null);lenRow();presets();prefSelect();renderLegend();
 const mqDark=matchMedia("(prefers-color-scheme: dark)");
@@ -483,9 +602,9 @@ new MutationObserver(()=>{readColors();req()}).observe(document.documentElement,
 mqDark.addEventListener?.("change",()=>{readColors();req()});
 new ResizeObserver(()=>{if(!GEO)return;const c=[(W/2-view.tx)/view.k,(Hh/2-view.ty)/view.k];sizeCanvas();const z=view.k/k0;home();view.k=k0*z;view.tx=W/2-c[0]*view.k;view.ty=Hh/2-c[1]*view.k;draw()}).observe(wrap);
 (async()=>{
-  try{await load()}catch(e){$("#loading").textContent="データを読みこめませんでした。ページを開きなおしてください。";return}
+  try{await load()}catch(e){$("#loading").textContent="データを読み込めませんでした。ページを開きなおしてください。";return}
   readColors();sizeCanvas();home();
-  const m=/^#p(\d+)$/.exec(location.hash);if(m&&+m[1]>=1&&+m[1]<=47){st.pref=+m[1];$("#pref").value=st.pref;view=fit(GEO.bb[st.pref],20)}
+  const m=/^#p(\d+)$/.exec(location.hash);if(m&&+m[1]>=1&&+m[1]<=47){st.pref=+m[1];$("#pref").value=st.pref;loadPlace(st.pref);view=fit(GEO.bb[st.pref],20)}
   $("#loading").hidden=true;renderStats();update();
 })();
 </script>
