@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>東京 土木散歩</title>
+<title>東京 土木建築散歩</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
@@ -207,7 +207,7 @@ dl.meta dt{color:var(--ink3)}dl.meta dd{margin:0}
 <header class="top"><div class="wrap">
   <div class="brand">
     <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M15 2L18.6 11.4 28 15 18.6 18.6 15 28 11.4 18.6 2 15 11.4 11.4Z" fill="var(--accent)"/></svg>
-    <div><b>東京 土木散歩</b><small>撮った写真で完成させる建築マップ</small></div>
+    <div><b>東京 土木建築散歩</b><small>撮った写真で完成させる土木・建築マップ</small></div>
   </div>
   <div class="prog" aria-live="polite">
     <svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle class="bgc" cx="17" cy="17" r="14"/><circle class="fgc" id="ring" cx="17" cy="17" r="14" stroke-dasharray="87.96" stroke-dashoffset="87.96"/></svg>
@@ -228,7 +228,7 @@ dl.meta dt{color:var(--ink3)}dl.meta dd{margin:0}
           <button class="ctrl" id="zfit" aria-label="全体を表示"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
           <button class="ctrl" id="locate" aria-label="現在地"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
         </div>
-        <div class="credit">© OpenStreetMap contributors</div>
+        <div class="credit" id="credit">© OpenStreetMap contributors</div>
       </div>
       <div class="panel side">
         <div class="panel-h" id="sideh"></div>
@@ -284,6 +284,7 @@ dl.meta dt{color:var(--ink3)}dl.meta dd{margin:0}
 
 <script src="tokyo-data.js" charset="utf-8"></script>
 <script src="tokyo-maps.js" charset="utf-8"></script>
+<script src="tokyo-maps-gsi.js" charset="utf-8"></script>
 <script src="tokyo-mapdraw.js" charset="utf-8"></script>
 <script>
 (function(){
@@ -493,6 +494,7 @@ function showMap(key,keepView){
   if(!keepView)fit("cover");
   drawMarks();renderChips();renderSide();
   $("#band").innerHTML='<b>'+esc(M.title)+'</b><span>'+esc(M.en||"")+'</span>';
+  $("#credit").textContent=M.credit||"© OpenStreetMap contributors";
 }
 // ジェスチャー
 const ptrs=new Map();let moved=0,lastPinch=null;
